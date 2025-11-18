@@ -1,0 +1,346 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { fetchLatestWriting } from '../lib/notion';
+
+const fallbackEssays = [
+  {
+    title: 'Hydration budgets for Astro islands',
+    summary:
+      'A framework for sizing interactive islands, picking the right renderer, and staying honest about the JavaScript tax.',
+    status: 'In progress',
+    href: '/blog/hydration-budgets',
+  },
+  {
+    title: 'Shipping calm dark-mode toggles',
+    summary:
+      'Design notes from building a preference-aware theme switcher without layout jank or surprise flashes.',
+    status: 'Published',
+    href: '/blog/calm-dark-mode',
+  },
+  {
+    title: 'Designing engineer-friendly rituals',
+    summary:
+      'Reflections on weekly demos, debugging salons, and other lightweight practices that keep teams curious.',
+    status: 'Notebook',
+    href: '/blog/rituals-for-engineers',
+  },
+];
+
+const notionEssays = await fetchLatestWriting(6);
+const essays = notionEssays.length ? notionEssays : fallbackEssays;
+
+const signalBoosts = [
+  {
+    title: 'Lightning talk · CascadiaJS',
+    detail: 'Measuring micro-interactions with the Vitals API (slides + demo repo).',
+    href: 'https://speakerdeck.com/feifan/micro-interactions',
+  },
+  {
+    title: 'Guest on Frontend First',
+    detail: 'Chatting about Astro, composable timelines, and intentional DX.',
+    href: 'https://frontendfirst.fm/astro-timelines',
+  },
+  {
+    title: 'Workshop · Plotting performance budgets',
+    detail: 'Hands-on session for teams adopting Astro islands at scale.',
+    href: 'mailto:hi@feifan.dev?subject=Performance%20Workshop',
+  },
+];
+
+const readingList = [
+  {
+    title: 'Creative Selection',
+    author: 'Ken Kocienda',
+    note: 'Rapid iteration stories that inspire my prototyping cadence.',
+  },
+  {
+    title: 'Designing Data-Intensive Applications',
+    author: 'Martin Kleppmann',
+    note: 'Required reading for thoughtful system boundaries.',
+  },
+  {
+    title: 'The Creative Act',
+    author: 'Rick Rubin',
+    note: 'A reminder to protect the quiet headspace where ideas form.',
+  },
+];
+
+const nowFocus = [
+  'Documenting an Astro + Cloudflare edge starter.',
+  'Sketching calm animation patterns for booking flows.',
+  'Hosting monthly office hours for early-stage founders.',
+];
+---
+
+<Layout title="Thoughts — feifan.dev">
+  <header class="thoughts-hero glass-panel">
+    <span class="chip">Notes, riffs, and signal boosts</span>
+    <h1>Thoughts is my digital studio log.</h1>
+    <p>
+      Essays, experiments, and field notes on building calm interfaces, intentional teams, and tools
+      that keep the web weird. It is equal parts notebook and broadcast channel.
+    </p>
+    <div class="thoughts-hero__actions">
+      <a class="hero-cta" href="mailto:hi@feifan.dev?subject=Let%27s%20collaborate">Say hi</a>
+      <a class="hero-secondary" href="#writing">Skip to writing</a>
+    </div>
+  </header>
+
+  <section id="writing" class="thoughts-section thoughts-section--grid">
+    <div class="section-heading">
+      <h2>Latest writing</h2>
+      <p>Published articles, drafts, and living notebooks.</p>
+    </div>
+    <div class="thoughts-grid">
+      {essays.map((essay) => (
+        <article class="essay-card">
+          <span class="essay-status">{essay.status}</span>
+          <h3><a href={essay.href}>{essay.title}</a></h3>
+          <p>{essay.summary}</p>
+          <a class="ghost-link" href={essay.href}>
+            Read the piece ↗
+          </a>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="thoughts-section thoughts-section--split">
+    <div>
+      <h2>Signal boosts</h2>
+      <ul class="signal-list">
+        {signalBoosts.map((item) => (
+          <li>
+            <h3>{item.title}</h3>
+            <p>{item.detail}</p>
+            <a class="ghost-link" href={item.href}>
+              View details ↗
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+    <div>
+      <h2>Now reading</h2>
+      <ul class="reading-list">
+        {readingList.map((book) => (
+          <li>
+            <div>
+              <h3>{book.title}</h3>
+              <span>{book.author}</span>
+            </div>
+            <p>{book.note}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="thoughts-section thoughts-section--focus">
+    <h2>What I am exploring right now</h2>
+    <ul>
+      {nowFocus.map((item) => (
+        <li>{item}</li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="thoughts-section thoughts-section--cta glass-panel">
+    <div>
+      <h2>Let’s swap ideas</h2>
+      <p>
+        I host casual office hours every month for founders, product leaders, and creative technologists.
+        Bring a prototype, a question, or a hunch. I will bring candor and sketches.
+      </p>
+    </div>
+    <div class="cta-actions">
+      <a class="hero-cta" href="mailto:hi@feifan.dev?subject=Book%20office%20hours">Book a slot</a>
+      <a class="hero-secondary" href="https://tinyletter.com/feifan" target="_blank" rel="noreferrer">
+        Subscribe for updates
+      </a>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .thoughts-hero {
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .thoughts-hero h1 {
+    font-size: clamp(2.5rem, 4vw, 3.5rem);
+    margin: 0;
+    line-height: 1.1;
+  }
+
+  .thoughts-hero p {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-muted);
+  }
+
+  .thoughts-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .hero-cta,
+  .hero-secondary {
+    text-decoration: none;
+    padding: 0.85rem 1.5rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+  }
+
+  .hero-cta {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .hero-secondary {
+    border: 1px solid var(--panel-border);
+    color: var(--text-primary);
+  }
+
+  .hero-cta:hover,
+  .hero-cta:focus-visible,
+  .hero-secondary:hover,
+  .hero-secondary:focus-visible {
+    transform: translateY(-2px);
+  }
+
+  .thoughts-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .thoughts-section--grid .thoughts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .section-heading h2 {
+    margin: 0;
+  }
+
+  .section-heading p {
+    margin: 0;
+  }
+
+  .essay-card {
+    padding: 1.5rem;
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    background: var(--panel-bg);
+    box-shadow: var(--panel-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .essay-status {
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .essay-card h3 {
+    margin: 0;
+  }
+
+  .essay-card h3 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .essay-card h3 a:hover,
+  .essay-card h3 a:focus-visible {
+    text-decoration: underline;
+  }
+
+  .ghost-link {
+    text-decoration: none;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-weight: 500;
+  }
+
+  .ghost-link:hover,
+  .ghost-link:focus-visible {
+    color: var(--text-primary);
+  }
+
+  .thoughts-section--split {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .thoughts-section--split > div {
+    padding: 1.5rem;
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    background: var(--panel-bg);
+    box-shadow: var(--panel-shadow);
+  }
+
+  .signal-list,
+  .reading-list,
+  .thoughts-section--focus ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .signal-list h3,
+  .reading-list h3 {
+    margin: 0;
+  }
+
+  .reading-list span {
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .thoughts-section--focus ul li {
+    padding: 0.85rem 1.25rem;
+    border-radius: 12px;
+    border: 1px dashed rgba(11, 11, 11, 0.12);
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  .thoughts-section--cta {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 2.5rem;
+  }
+
+  .cta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  @media (max-width: 720px) {
+    .thoughts-hero {
+      padding: 2.25rem;
+    }
+  }
+</style>

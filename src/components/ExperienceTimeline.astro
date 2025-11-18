@@ -1,0 +1,315 @@
+---
+interface ExperienceProject {
+  name: string;
+  description: string;
+  href?: string;
+}
+
+interface ExperienceItem {
+  company: string;
+  role: string;
+  period: string;
+  year?: string;
+  summary: string;
+  technologies?: string[];
+  projects?: ExperienceProject[];
+}
+
+interface Props {
+  items: ExperienceItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<section class="timeline" aria-label="Professional experience timeline">
+  <div class="timeline__line" aria-hidden="true"></div>
+  <ol>
+    {items.map((item, index) => (
+      <li class:list={{
+        'timeline__item': true,
+        'timeline__item--left': index % 2 === 0,
+        'timeline__item--right': index % 2 !== 0,
+      }}>
+        {item.year && (
+          <span class="timeline__year">{item.year}</span>
+        )}
+        <article class="timeline__card">
+          <header>
+            <div class="timeline__meta">
+              <span class="timeline__period">{item.period}</span>
+              <span class="timeline__company">{item.company}</span>
+            </div>
+            <h3>{item.role}</h3>
+          </header>
+          <p>{item.summary}</p>
+          {item.technologies && item.technologies.length > 0 && (
+            <ul class="timeline__tech">
+              {item.technologies.map((tech) => (
+                <li>{tech}</li>
+              ))}
+            </ul>
+          )}
+          {item.projects && item.projects.length > 0 && (
+            <div class="timeline__projects">
+              <span class="timeline__projects-label">Highlighted work</span>
+              <ul class="timeline__projects-list">
+                {item.projects.map((project, projectIndex) => (
+                  <li class="project-accordion">
+                    <details>
+                      <summary>
+                        <span>{project.name}</span>
+                        <svg viewBox="0 0 16 16" aria-hidden="true">
+                          <path d="M4 6l4 4 4-4" />
+                        </svg>
+                      </summary>
+                      <div class="project-panel" id={`project-${index}-${projectIndex}`}>
+                        <p>{project.description}</p>
+                        {project.href && (
+                          <a href={project.href} target="_blank" rel="noreferrer">
+                            Visit project ↗
+                          </a>
+                        )}
+                      </div>
+                    </details>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </article>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<style>
+  .timeline {
+    position: relative;
+    padding: 1rem 0;
+  }
+
+  .timeline__line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: rgba(11, 11, 11, 0.12);
+    transform: translateX(-50%);
+  }
+
+  ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .timeline__item {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    padding-top: 0.5rem;
+  }
+
+  .timeline__year {
+    position: absolute;
+    top: -0.35rem;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 999px;
+    padding: 0.1rem 0.65rem;
+    white-space: nowrap;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  }
+
+  .timeline__card {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    box-shadow: var(--panel-shadow);
+    padding: 1.75rem;
+    width: min(420px, 90vw);
+  }
+
+  .timeline__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .timeline__period {
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .timeline__company {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .timeline__tech {
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .timeline__tech li {
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .timeline__item--left .timeline__card {
+    margin-right: auto;
+    transform-origin: right;
+  }
+
+  .timeline__item--right .timeline__card {
+    margin-left: auto;
+    transform-origin: left;
+  }
+
+  .timeline__projects {
+    margin-top: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .timeline__projects-label {
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .timeline__projects-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .project-accordion details {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.03);
+    padding: 0.35rem 0.75rem;
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .project-accordion details[open] {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.2);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  .project-accordion summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+  }
+
+  .project-accordion summary::marker,
+  .project-accordion summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .project-accordion summary svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    fill: none;
+    transition: transform 0.2s ease;
+  }
+
+  .project-accordion details[open] summary svg {
+    transform: rotate(180deg);
+  }
+
+  .project-panel {
+    padding: 0 0.25rem 0.35rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .project-panel p {
+    margin: 0.5rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .project-panel a {
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--text-primary);
+  }
+
+  .project-panel a:hover,
+  .project-panel a:focus-visible {
+    text-decoration: underline;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 800px) {
+    .timeline__line {
+      left: 2rem;
+    }
+
+    .timeline__year {
+      left: 2rem;
+      transform: translate(-50%, -100%);
+    }
+
+    .timeline__card {
+      margin: 0 0 0 3.5rem;
+      width: 100%;
+    }
+
+    .timeline__item--right .timeline__card,
+    .timeline__item--left .timeline__card {
+      margin: 0 0 0 3.5rem;
+    }
+  }
+</style>

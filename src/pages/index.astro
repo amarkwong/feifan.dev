@@ -1,102 +1,160 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Card from '../components/Card.astro';
+import ExperienceTimeline from '../components/ExperienceTimeline.astro';
+
+const experience = [
+  {
+    company: 'Flight Centre',
+    role: 'Front-End Engineer',
+    period: '2024 — Present',
+    year: '2024',
+    summary:
+      'Leading the rebuild of booking flows with Astro islands and edge rendering, cutting TTFB by 35% while keeping accessibility pristine.',
+  technologies: ['Astro', 'React', 'Tailwind', 'Edge Functions'],
+    projects: [
+      {
+        name: 'Trips Booking OS',
+        description: 'Modular booking portal that merges flights + hotels into a single quoteable flow with real-time fare validation.',
+      },
+      {
+        name: 'Loyalty Compass',
+        description: 'Dashboard that surfaces live loyalty inventory and upsell nudges across 40+ markets.',
+      },
+    ],
+  },
+  {
+    company: 'Acme Corp',
+    role: 'Full-Stack Developer',
+    period: '2022 — 2024',
+    year: '2022',
+    summary:
+      'Shipped internal tooling for 500+ operators, modernizing a legacy stack into type-safe services and reusable UI primitives.',
+  technologies: ['Next.js', 'Node.js', 'Postgres', 'AWS'],
+    projects: [
+      {
+        name: 'Ops Control Tower',
+        description: 'Multi-tenant workflow tool with fine-grained permissions, 8x faster ticket triage, and live SLA tracking.',
+      },
+      {
+        name: 'Signals API',
+        description: 'Event-driven analytics pipeline exposing customer health signals to downstream tooling.',
+      },
+    ],
+  },
+  {
+    company: 'Independent',
+    role: 'Product Engineer',
+    period: '2018 — 2022',
+    year: '2018',
+    summary:
+      'Partnered with startups to design and build minimal web experiences—from analytics dashboards to rapid landing-page experiments.',
+  technologies: ['Astro', 'Remix', 'Cloudflare', 'Design Systems'],
+    projects: [
+      {
+        name: 'Astro Portfolio',
+        description: 'This minimalist site built to test drive Astro content collections, MDX, and edge-friendly deployment.',
+        href: 'https://github.com/feifan/astro-portfolio',
+      },
+      {
+        name: 'Map Extension',
+        description: 'Chrome extension overlaying saved routes and commute insights directly onto Google Maps.',
+        href: 'https://github.com/feifan/map-extension',
+      },
+    ],
+  },
+];
 ---
 
-<Layout title="Welcome to feifan.dev">
-	<main>
-		<svg
-			class="astro-a"
-			width="495"
-			height="623"
-			viewBox="0 0 495 623"
-			fill="none"
-			xmlns="http://www.w3.org/2000/svg"
-			aria-hidden="true"
-		>
-			<path
-				fill-rule="evenodd"
-				clip-rule="evenodd"
-				d="M167.19 364.254C83.4786 364.254 0 404.819 0 404.819C0 404.819 141.781 19.4876 142.087 18.7291C146.434 7.33701 153.027 0 162.289 0H332.441C341.703 0 348.574 7.33701 352.643 18.7291C352.92 19.5022 494.716 404.819 494.716 404.819C494.716 404.819 426.67 364.254 327.525 364.254L264.41 169.408C262.047 159.985 255.147 153.581 247.358 153.581C239.569 153.581 232.669 159.985 230.306 169.408L167.19 364.254ZM160.869 530.172C160.877 530.18 160.885 530.187 160.894 530.195L160.867 530.181C160.868 530.178 160.868 530.175 160.869 530.172ZM136.218 411.348C124.476 450.467 132.698 504.458 160.869 530.172C160.997 529.696 161.125 529.242 161.248 528.804C161.502 527.907 161.737 527.073 161.917 526.233C165.446 509.895 178.754 499.52 195.577 500.01C211.969 500.487 220.67 508.765 223.202 527.254C224.141 534.12 224.23 541.131 224.319 548.105C224.328 548.834 224.337 549.563 224.347 550.291C224.563 566.098 228.657 580.707 237.264 593.914C245.413 606.426 256.108 615.943 270.749 622.478C270.593 621.952 270.463 621.508 270.35 621.126C270.045 620.086 269.872 619.499 269.685 618.911C258.909 585.935 266.668 563.266 295.344 543.933C298.254 541.971 301.187 540.041 304.12 538.112C310.591 533.854 317.059 529.599 323.279 525.007C345.88 508.329 360.09 486.327 363.431 457.844C364.805 446.148 363.781 434.657 359.848 423.275C358.176 424.287 356.587 425.295 355.042 426.275C351.744 428.366 348.647 430.33 345.382 431.934C303.466 452.507 259.152 455.053 214.03 448.245C184.802 443.834 156.584 436.019 136.218 411.348Z"
-				fill="url(#paint0_linear_1805_24383)"></path>
-			<defs>
-				<linearGradient
-					id="paint0_linear_1805_24383"
-					x1="247.358"
-					y1="0"
-					x2="247.358"
-					y2="622.479"
-					gradientUnits="userSpaceOnUse"
-				>
-					<stop stop-opacity="0.9"></stop>
-					<stop offset="1" stop-opacity="0.2"></stop>
-				</linearGradient>
-			</defs>
-		</svg>
-		<h1>Welcome to <span class="text-gradient">feifan.dev</span></h1>
-		<p class="instructions">
-			To get started, open the directory <code>src/pages</code> in your project.<br />
-			<strong>Code Challenge:</strong> Tweak the "Welcome to Astro" message above.
-		</p>
-	
-	</main>
+<Layout title="feifan.dev">
+  <header class="hero glass-panel">
+    <span class="chip">Currently building for the web</span>
+    <h1>Feifan crafts calm, high-impact digital experiences.</h1>
+    <p>
+      Front-of-the-frontend engineer obsessed with razor-sharp performance, thoughtful motion,
+      and joyful tooling. I distill complex systems into focused, human interfaces.
+    </p>
+    <div class="hero-links">
+      <a class="hero-cta" href="#experience">View experience timeline</a>
+      <a class="hero-secondary" href="/thoughts">Visit the thoughts hub</a>
+      <a class="hero-secondary" href="mailto:hi@feifan.dev">Get in touch</a>
+    </div>
+  </header>
+
+  <section id="about">
+    <h2>About</h2>
+    <p>
+      Hi, I’m Feifan—a software engineer passionate about minimal, performant web
+      experiences. I build, I learn, I share.
+      Long-form notes now live on <a href="/thoughts">the Thoughts page</a> for folks who want to dive deeper.
+    </p>
+  </section>
+
+  <section id="experience">
+    <h2>Experience</h2>
+    <ExperienceTimeline items={experience} />
+  </section>
+
 </Layout>
 
 <style>
-	main {
-		margin: auto;
-		padding: 1rem;
-		width: 800px;
-		max-width: calc(100% - 2rem);
-		color: white;
-		font-size: 20px;
-		line-height: 1.6;
-	}
-	.astro-a {
-		position: absolute;
-		top: -32px;
-		left: 50%;
-		transform: translatex(-50%);
-		width: 220px;
-		height: auto;
-		z-index: -1;
-	}
-	h1 {
-		font-size: 4rem;
-		font-weight: 700;
-		line-height: 1;
-		text-align: center;
-		margin-bottom: 1em;
-	}
-	.text-gradient {
-		background-image: var(--accent-gradient);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-size: 400%;
-		background-position: 0%;
-	}
-	.instructions {
-		margin-bottom: 2rem;
-		border: 1px solid rgba(var(--accent-light), 25%);
-		background: linear-gradient(rgba(var(--accent-dark), 66%), rgba(var(--accent-dark), 33%));
-		padding: 1.5rem;
-		border-radius: 8px;
-	}
-	.instructions code {
-		font-size: 0.8em;
-		font-weight: bold;
-		background: rgba(var(--accent-light), 12%);
-		color: rgb(var(--accent-light));
-		border-radius: 4px;
-		padding: 0.3em 0.4em;
-	}
-	.instructions strong {
-		color: rgb(var(--accent-light));
-	}
-	.link-card-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(24ch, 1fr));
-		gap: 2rem;
-		padding: 0;
-	}
+  .hero {
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    background: none;
+    border: 1px solid var(--panel-border);
+  }
+
+  .hero h1 {
+    font-size: clamp(2.5rem, 4vw, 3.5rem);
+    margin: 0;
+    line-height: 1.1;
+    color: var(--text-primary);
+  }
+
+  .hero p {
+    font-size: 1.15rem;
+    margin: 0;
+    color: var(--text-muted);
+  }
+
+  .hero-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .hero-cta,
+  .hero-secondary {
+    text-decoration: none;
+    padding: 0.85rem 1.5rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+  }
+
+  .hero-cta {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .hero-secondary {
+    border: 1px solid var(--panel-border);
+    color: var(--text-primary);
+  }
+
+  .hero-cta:hover,
+  .hero-cta:focus-visible,
+  .hero-secondary:hover,
+  .hero-secondary:focus-visible {
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 720px) {
+    .hero {
+      padding: 2.25rem;
+    }
+  }
 </style>

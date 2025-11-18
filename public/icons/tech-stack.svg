@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <defs>
+    <style>
+      text {
+        font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        font-weight: 600;
+        font-size: 18px;
+      }
+    </style>
+  </defs>
+  <symbol id="icon-typescript" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="#3178C6" />
+    <text x="32" y="32" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">TS</text>
+  </symbol>
+  <symbol id="icon-aws" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="#232F3E" />
+    <text x="32" y="32" fill="#FF9900" text-anchor="middle" dominant-baseline="middle">AWS</text>
+  </symbol>
+  <symbol id="icon-azure" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="#0078D4" />
+    <text x="32" y="32" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">Azure</text>
+  </symbol>
+  <symbol id="icon-c" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="#2C3E50" />
+    <text x="32" y="32" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">C</text>
+  </symbol>
+  <symbol id="icon-cpp" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="#00599C" />
+    <text x="32" y="32" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">C++</text>
+  </symbol>
+  <symbol id="icon-react" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="#20232A" />
+    <text x="32" y="32" fill="#61DAFB" text-anchor="middle" dominant-baseline="middle">React</text>
+  </symbol>
+  <symbol id="icon-hono" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="#FF5F6D" />
+    <text x="32" y="32" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">Hono</text>
+  </symbol>
+  <symbol id="icon-terraform" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="#623CE4" />
+    <text x="32" y="32" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">TF</text>
+  </symbol>
+  <symbol id="icon-aws-lambda" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="#FF9900" />
+    <text x="32" y="32" fill="#1B1B1B" text-anchor="middle" dominant-baseline="middle">λ</text>
+  </symbol>
+  <symbol id="icon-docker" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="#0DB7ED" />
+    <text x="32" y="32" fill="#083344" text-anchor="middle" dominant-baseline="middle">Docker</text>
+  </symbol>
+  <symbol id="icon-newrelic" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="#008C99" />
+    <text x="32" y="32" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">NR</text>
+  </symbol>
+  <symbol id="icon-splunk" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="#000000" />
+    <text x="32" y="32" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">spl</text>
+  </symbol>
+  <symbol id="icon-matlab" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="#F58025" />
+    <text x="32" y="32" fill="#00263A" text-anchor="middle" dominant-baseline="middle">MAT</text>
+  </symbol>
+  <symbol id="icon-julia" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="#6F4A8E" />
+    <text x="32" y="32" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">Julia</text>
+  </symbol>
+  <symbol id="icon-golang" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="#00ADD8" />
+    <text x="32" y="32" fill="#003B4A" text-anchor="middle" dominant-baseline="middle">Go</text>
+  </symbol>
+  <symbol id="icon-neuralnetwork" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="#111111" />
+    <text x="32" y="32" fill="#F4F4F4" text-anchor="middle" dominant-baseline="middle">NN</text>
+  </symbol>
+  <symbol id="icon-dotnet" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="#512BD4" />
+    <text x="32" y="32" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">.NET</text>
+  </symbol>
+  <symbol id="icon-sqlserver" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="#CC2927" />
+    <text x="32" y="32" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">SQL</text>
+  </symbol>
+  <symbol id="icon-aix" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="#1F70C1" />
+    <text x="32" y="32" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">AIX</text>
+  </symbol>
+  <symbol id="icon-linux" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="14" fill="#000000" />
+    <text x="32" y="32" fill="#FFD141" text-anchor="middle" dominant-baseline="middle">Linux</text>
+  </symbol>
+</svg>

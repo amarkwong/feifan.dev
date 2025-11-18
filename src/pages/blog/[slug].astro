@@ -1,0 +1,146 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { fetchNotionArticle } from '../../lib/notion';
+import { blogEntries, type BlogEntry } from '../../data/blogEntries';
+
+export function getStaticPaths() {
+  return blogEntries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props as { entry?: BlogEntry };
+
+if (!entry) {
+  throw new Error('No blog entry provided for this slug.');
+}
+const article = await fetchNotionArticle(entry.notionPageId);
+
+const title = article?.title ?? 'Draft coming soon';
+const lastUpdated = article?.updatedAt
+  ? new Date(article.updatedAt).toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    })
+  : null;
+
+const contentHtml =
+  article?.content ??
+  '<p>The full article lives on Notion. Add NOTION_API_KEY (and share the page with your integration) to render it here.</p>';
+---
+
+<Layout title={`${title} — feifan.dev`}>
+  <article class="blog-article glass-panel">
+    <p class="blog-eyebrow">Published via Notion</p>
+    <h1>{title}</h1>
+    <p class="blog-summary">{entry.summary}</p>
+
+    <div class="blog-meta">
+      <div class="blog-tags">
+        {entry.tags.map((tag) => (
+          <span class="chip">{tag}</span>
+        ))}
+      </div>
+      {lastUpdated && <span class="blog-date">Updated {lastUpdated}</span>}
+    </div>
+
+    <div class="blog-content" set:html={contentHtml}></div>
+  </article>
+</Layout>
+
+<style>
+  .blog-article {
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .blog-eyebrow {
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  .blog-summary {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+
+  .blog-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .blog-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .blog-date {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+  }
+
+  .blog-content {
+    line-height: 1.8;
+    color: var(--text-primary);
+  }
+
+  .blog-content h1,
+  .blog-content h2,
+  .blog-content h3 {
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .blog-content p {
+    max-width: 65ch;
+  }
+
+  .blog-content blockquote {
+    border-left: 3px solid var(--text-primary);
+    padding-left: 1rem;
+    margin-left: 0;
+    color: var(--text-muted);
+  }
+
+  .blog-content pre {
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.04);
+    border-radius: 12px;
+    overflow-x: auto;
+  }
+
+  .blog-content ul,
+  .blog-content ol {
+    padding-left: 1.5rem;
+  }
+
+  .blog-content ul li,
+  .blog-content ol li {
+    margin-bottom: 0.5rem;
+  }
+
+  .notion-callout {
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  @media (max-width: 720px) {
+    .blog-article {
+      padding: 2rem;
+    }
+  }
+</style>

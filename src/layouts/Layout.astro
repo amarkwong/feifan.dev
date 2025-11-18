@@ -1,51 +1,67 @@
 ---
-interface Props {
-	title: string;
-}
-
+import Navbar from '../components/Navbar.astro';
 const { title } = Astro.props;
 ---
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="description" content="Astro description" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-	</head>
-	<body>
-		<slot />
-	</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <link rel="stylesheet" href="/styles/global.css" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+  </head>
+  <body>
+    <Navbar title={title} />
+    <main>
+      <div class="page-shell">
+        <slot />
+      </div>
+    </main>
+  </body>
 </html>
-<style is:global>
-	:root {
-		--accent: 136, 58, 234;
-		--accent-light: 224, 204, 250;
-		--accent-dark: 49, 10, 101;
-		--accent-gradient: linear-gradient(
-			45deg,
-			rgb(var(--accent)),
-			rgb(var(--accent-light)) 30%,
-			white 60%
-		);
-	}
-	html {
-		font-family: system-ui, sans-serif;
-		background: #13151a;
-		background-size: 224px;
-	}
-	code {
-		font-family:
-			Menlo,
-			Monaco,
-			Lucida Console,
-			Liberation Mono,
-			DejaVu Sans Mono,
-			Bitstream Vera Sans Mono,
-			Courier New,
-			monospace;
-	}
+
+<style>
+  body {
+    margin: 0;
+    background: var(--bg-base);
+    color: var(--text-primary);
+  }
+  main {
+    padding-top: 4rem; /* leave space for navbar */
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 5rem 2rem 4rem;
+    line-height: 1.7;
+  }
+  .page-shell {
+    gap: 3rem;
+    display: flex;
+    flex-direction: column;
+  }
+  section {
+    margin: 0;
+    padding: 2rem;
+    border-radius: 14px;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    box-shadow: var(--panel-shadow);
+  }
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    letter-spacing: 0.04em;
+    text-transform: none;
+    color: var(--text-primary);
+  }
+
+  @media (max-width: 720px) {
+    main {
+      padding: 5rem 1.25rem 3rem;
+    }
+    section {
+      padding: 2rem;
+    }
+  }
 </style>
