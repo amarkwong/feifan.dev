@@ -1,23 +1,90 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { fetchNotionArticle } from '../../lib/notion';
-import { blogEntries, type BlogEntry } from '../../data/blogEntries';
+import { fetchNotionArticle, fetchChildPages, fetchNotionPublicUrl } from '../../lib/notion';
+import { blogEntries, blogCollections, type BlogEntry } from '../../data/blogEntries';
 
-export function getStaticPaths() {
-  return blogEntries.map((entry) => ({
-    params: { slug: entry.slug },
-    props: { entry },
-  }));
+type RouteEntry = BlogEntry & {
+  titleOverride?: string;
+  notionPublicUrl?: string | null;
+};
+
+export async function getStaticPaths() {
+  const slugCounts = new Map<string, number>();
+
+  const ensureUniqueSlug = (slug: string) => {
+    if (!slugCounts.has(slug)) {
+      slugCounts.set(slug, 1);
+      return slug;
+    }
+    const count = (slugCounts.get(slug) ?? 1) + 1;
+    slugCounts.set(slug, count);
+    return `${slug}-${count}`;
+  };
+
+  const slugify = (value: string) => {
+    const base = value
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    return base || 'untitled';
+  };
+
+  const manualPaths = await Promise.all(
+    blogEntries.map(async (entry) => ({
+      params: { slug: ensureUniqueSlug(entry.slug) },
+      props: {
+        entry: {
+          ...entry,
+          notionPublicUrl: await fetchNotionPublicUrl(entry.notionPageId),
+        },
+      },
+    }))
+  );
+
+  const collectionPaths = (
+    await Promise.all(
+      blogCollections.map(async (collection) => {
+        const children = await fetchChildPages(collection.parentPageId);
+        return children.map((child) => {
+          const rawSlug = `${collection.slugPrefix ?? ''}${slugify(child.title)}`;
+          const slug = ensureUniqueSlug(rawSlug || slugify(child.id));
+          return {
+            params: { slug },
+            props: {
+              entry: {
+                slug,
+                notionPageId: child.id,
+                summary: collection.summary,
+                tags: collection.tags,
+                titleOverride: child.title,
+                notionPublicUrl: child.publicUrl ?? undefined,
+              },
+            },
+          };
+        });
+      })
+    )
+  ).flat();
+
+  return [...manualPaths, ...collectionPaths];
 }
 
-const { entry } = Astro.props as { entry?: BlogEntry };
+const { entry } = Astro.props as { entry?: RouteEntry };
+
+if (entry?.notionPublicUrl) {
+  return Astro.redirect(entry.notionPublicUrl);
+}
 
 if (!entry) {
   throw new Error('No blog entry provided for this slug.');
 }
 const article = await fetchNotionArticle(entry.notionPageId);
 
-const title = article?.title ?? 'Draft coming soon';
+if (article?.publicUrl) {
+  return Astro.redirect(article.publicUrl);
+}
+
 const lastUpdated = article?.updatedAt
   ? new Date(article.updatedAt).toLocaleDateString('en-US', {
       month: 'long',
@@ -29,17 +96,48 @@ const lastUpdated = article?.updatedAt
 const contentHtml =
   article?.content ??
   '<p>The full article lives on Notion. Add NOTION_API_KEY (and share the page with your integration) to render it here.</p>';
+
+const derivedSummary = entry.summary || summarizeHtml(article?.content ?? '') || 'Thoughts coming soon.';
+const displayTitle = entry.titleOverride || article?.title || 'Draft coming soon';
+const articleIcon = article?.icon;
+const isEmojiIcon = articleIcon?.type === 'emoji';
+const isImageIcon = articleIcon?.type === 'image';
+
+function summarizeHtml(html: string, maxLength = 180) {
+  if (!html) return '';
+  const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!text) return '';
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength).trimEnd() + '…';
+}
 ---
 
-<Layout title={`${title} — feifan.dev`}>
+<Layout title={`${displayTitle} — feifan.dev`}>
+  {article?.coverUrl && (
+    <div class="blog-cover">
+      <img src={article.coverUrl} alt={`${displayTitle} cover image`} loading="lazy" />
+    </div>
+  )}
   <article class="blog-article glass-panel">
-    <p class="blog-eyebrow">Published via Notion</p>
-    <h1>{title}</h1>
-    <p class="blog-summary">{entry.summary}</p>
+    <div class="blog-header">
+      {isEmojiIcon && articleIcon?.value && (
+        <span class="blog-icon blog-icon--emoji" role="img" aria-label={`${displayTitle} icon`}>
+          {articleIcon.value}
+        </span>
+      )}
+      {isImageIcon && articleIcon?.value && (
+        <img class="blog-icon blog-icon--image" src={articleIcon.value} alt="" loading="lazy" />
+      )}
+      <div class="blog-heading">
+        <p class="blog-eyebrow">Published via Notion</p>
+        <h1>{displayTitle}</h1>
+        <p class="blog-summary">{derivedSummary}</p>
+      </div>
+    </div>
 
     <div class="blog-meta">
       <div class="blog-tags">
-        {entry.tags.map((tag) => (
+        {(entry.tags ?? []).map((tag) => (
           <span class="chip">{tag}</span>
         ))}
       </div>
@@ -51,11 +149,60 @@ const contentHtml =
 </Layout>
 
 <style>
+  .blog-cover {
+    width: 100vw;
+    max-height: 360px;
+    overflow: hidden;
+    margin: 0 calc(50% - 50vw) 2rem;
+    border-bottom: 1px solid var(--panel-border);
+  }
+
+  .blog-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
   .blog-article {
     padding: 3rem;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+  }
+
+  .blog-header {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .blog-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .blog-icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .blog-icon--emoji {
+    font-size: 3rem;
+    padding: 0.75rem;
+  }
+
+  .blog-icon--image {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    padding: 0.5rem;
   }
 
   .blog-eyebrow {
@@ -94,6 +241,20 @@ const contentHtml =
   .blog-content {
     line-height: 1.8;
     color: var(--text-primary);
+  }
+
+  .blog-content .notion-image {
+    max-width: min(900px, 100%);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .blog-content .notion-image--full {
+    max-width: min(1200px, 100vw);
+  }
+
+  .blog-content .notion-image--full img {
+    border-radius: 0;
   }
 
   .blog-content h1,
@@ -141,6 +302,20 @@ const contentHtml =
   @media (max-width: 720px) {
     .blog-article {
       padding: 2rem;
+    }
+
+    .blog-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .blog-icon--image {
+      width: 56px;
+      height: 56px;
+    }
+
+    .blog-cover {
+      max-height: 240px;
     }
   }
 </style>

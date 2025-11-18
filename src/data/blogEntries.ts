@@ -1,15 +1,25 @@
 export interface BlogEntry {
   slug: string;
   notionPageId: string;
-  summary: string;
-  tags: string[];
+  summary?: string;
+  tags?: string[];
+  titleOverride?: string;
 }
 
-export const blogEntries: BlogEntry[] = [
+export interface BlogCollection {
+  parentPageId: string;
+  slugPrefix?: string;
+  tags?: string[];
+  summary?: string;
+}
+
+export const blogEntries: BlogEntry[] = [];
+
+export const blogCollections: BlogCollection[] = [
   {
-    slug: 'why-i-choose-julia',
-    notionPageId: '69064ec1c03a42b2a46dc579280c2358',
-    summary: 'Lessons from building an energy management system with Julia.',
-    tags: ['Energy', 'Julia', 'Case study'],
+    parentPageId: 'bdba8cdeb9054c2db7f6f099a3ed8ce8',
+    slugPrefix: '',
+    tags: ['Notebook'],
+    summary: 'Notes and links from the Profile Website hub.',
   },
 ];

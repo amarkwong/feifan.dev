@@ -65,3 +65,30 @@ a:focus-visible {
   border: 1px solid rgba(11, 11, 11, 0.04);
   color: var(--text-muted);
 }
+
+.notion-image {
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.notion-image img {
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: var(--panel-shadow);
+}
+
+.notion-image figcaption {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
+.notion-equation {
+  margin: 1.5rem auto;
+  padding: 1rem;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.02);
+  font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  font-size: 1.1rem;
+  text-align: center;
+}

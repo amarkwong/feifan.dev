@@ -1,3 +1,5 @@
+import katex from 'katex';
+
 export interface WritingEntry {
   title: string;
   summary: string;
@@ -5,10 +7,18 @@ export interface WritingEntry {
   href: string;
 }
 
+export interface NotionIcon {
+  type: 'emoji' | 'image';
+  value: string;
+}
+
 export interface NotionArticle {
   title: string;
   updatedAt: string | null;
   content: string;
+  coverUrl?: string | null;
+  icon?: NotionIcon | null;
+  publicUrl?: string | null;
 }
 
 const NOTION_API_KEY = import.meta.env.NOTION_API_KEY;
@@ -23,6 +33,28 @@ const POST_OPTIONS = {
     },
   ],
 };
+
+function normalizeId(id: string): string {
+  return id?.replace(/-/g, '') ?? '';
+}
+
+function buildNotionImageUrl(source?: string, resourceId?: string): string | null {
+  if (!source) return null;
+  if (source.startsWith('data:')) return source;
+  if (source.startsWith('https://www.notion.so/image/')) return source;
+  const encoded = encodeURIComponent(source);
+  const idFragment = resourceId ? `&id=${resourceId}` : '';
+  return `https://www.notion.so/image/${encoded}?table=block${idFragment}&cache=v2`;
+}
+
+function resolveNotionFileUrl(file: any, resourceId?: string): string | null {
+  if (!file) return null;
+  const type = file.type;
+  if (!type) return null;
+  const source = file?.[type]?.url;
+  if (!source) return null;
+  return buildNotionImageUrl(source, resourceId);
+}
 
 function getHeaders() {
   if (!NOTION_API_KEY) return null;
@@ -150,8 +182,51 @@ function renderBlock(block: any): string {
       return `<li data-list="numbered">${renderRichText(block.numbered_list_item?.rich_text)}</li>`;
     case 'callout':
       return `<aside class="notion-callout">${renderRichText(block.callout?.rich_text)}</aside>`;
+    case 'image':
+      return renderImageBlock(block);
+    case 'equation':
+      return renderEquationBlock(block);
     default:
       return '';
+  }
+}
+
+function resolveImageSource(block: any): string | null {
+  const resourceId = block?.id ? normalizeId(block.id) : undefined;
+  return resolveNotionFileUrl(block?.image, resourceId);
+}
+
+function renderImageBlock(block: any): string {
+  const url = resolveImageSource(block);
+  if (!url) return '';
+
+  const isFullWidth = Boolean(block?.format?.block_full_width);
+  const figureClass = `notion-image${isFullWidth ? ' notion-image--full' : ''}`;
+  const captionHtml = renderRichText(block.image?.caption);
+  const altText = extractPlainText(block.image?.caption) || 'Notion image';
+
+  return `<figure class="${figureClass}">
+    <img src="${url}" alt="${escapeHtml(altText)}" loading="lazy" />
+    ${captionHtml ? `<figcaption>${captionHtml}</figcaption>` : ''}
+  </figure>`;
+}
+
+function renderEquationBlock(block: any): string {
+  const expression = block?.equation?.expression;
+  if (!expression) return '';
+
+  try {
+    const rendered = katex.renderToString(expression, {
+      throwOnError: false,
+      displayMode: true,
+      output: 'html',
+    });
+    return `<div class="notion-equation" aria-label="Equation">${rendered}</div>`;
+  } catch (error) {
+    console.error('[Notion] KaTeX render error', error);
+    return `<div class="notion-equation notion-equation--fallback" aria-label="Equation">
+      <code>${escapeHtml(expression)}</code>
+    </div>`;
   }
 }
 
@@ -220,6 +295,32 @@ async function fetchBlockChildren(blockId: string): Promise<any[]> {
   return blocks;
 }
 
+async function fetchNotionPage(pageId: string, headers: Record<string, string>) {
+  try {
+    const response = await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
+      method: 'GET',
+      headers,
+    });
+
+    if (!response.ok) {
+      console.error('[Notion] Failed to fetch page', await response.text());
+      return null;
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('[Notion] Unexpected page fetch error', error);
+    return null;
+  }
+}
+
+export async function fetchNotionPublicUrl(pageId: string): Promise<string | null> {
+  const headers = getHeaders();
+  if (!headers || !pageId) return null;
+  const pageData = await fetchNotionPage(pageId, headers);
+  return pageData?.public_url ?? null;
+}
+
 export async function fetchNotionArticle(pageId: string): Promise<NotionArticle | null> {
   const headers = getHeaders();
   if (!headers || !pageId) {
@@ -227,29 +328,59 @@ export async function fetchNotionArticle(pageId: string): Promise<NotionArticle 
   }
 
   try {
-    const pageResponse = await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
-      method: 'GET',
-      headers,
-    });
-
-    if (!pageResponse.ok) {
-      console.error('[Notion] Failed to fetch page', await pageResponse.text());
-      return null;
-    }
-
-    const pageData = await pageResponse.json();
+    const pageData = await fetchNotionPage(pageId, headers);
+    if (!pageData) return null;
+    const normalizedPageId = normalizeId(pageData?.id ?? pageId);
     const title =
       extractPlainText(pageData?.properties?.Title?.title ?? pageData?.properties?.Name?.title ?? []) || 'Untitled';
     const blocks = await fetchBlockChildren(pageId);
     const content = groupLists(blocks);
+    const coverUrl = resolveNotionFileUrl(pageData?.cover, normalizedPageId);
+
+    let icon: NotionIcon | null = null;
+    if (pageData?.icon?.type === 'emoji' && pageData.icon.emoji) {
+      icon = { type: 'emoji', value: pageData.icon.emoji };
+    } else if (pageData?.icon) {
+      const iconUrl = resolveNotionFileUrl(pageData.icon, normalizedPageId);
+      if (iconUrl) {
+        icon = { type: 'image', value: iconUrl };
+      }
+    }
 
     return {
       title,
       updatedAt: pageData?.last_edited_time ?? null,
       content,
+      coverUrl,
+      icon,
+      publicUrl: pageData?.public_url ?? null,
     };
   } catch (error) {
     console.error('[Notion] Unexpected page fetch error', error);
     return null;
   }
+}
+
+export interface NotionChildPage {
+  id: string;
+  title: string;
+  publicUrl?: string | null;
+}
+
+export async function fetchChildPages(parentPageId: string): Promise<NotionChildPage[]> {
+  if (!parentPageId) return [];
+  const blocks = await fetchBlockChildren(parentPageId);
+  const childPages = blocks
+    .filter((block) => block.type === 'child_page')
+    .map((block) => ({
+      id: normalizeId(block.id),
+      title: block.child_page?.title ?? 'Untitled',
+    }));
+
+  return Promise.all(
+    childPages.map(async (child) => ({
+      ...child,
+      publicUrl: await fetchNotionPublicUrl(child.id),
+    }))
+  );
 }
