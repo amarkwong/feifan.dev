@@ -69,6 +69,12 @@ variable "managed_zone" {
   default     = ""
 }
 
+variable "pages_cname_proxied" {
+  type        = bool
+  description = "Whether Terraform-created CNAME records for Pages should be proxied (orange-cloud). Set false temporarily if you hit CF error 1014."
+  default     = true
+}
+
 variable "production_env_vars" {
   type        = map(string)
   description = "Environment variables for production deployments (e.g., NOTION_API_KEY)"

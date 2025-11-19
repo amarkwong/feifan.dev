@@ -1,0 +1,32 @@
+# Copy this file to terraform.tfvars and fill in the secrets/IDs below.
+# Never commit the real terraform.tfvars file—keep it local or in a secure secrets store.
+
+cloudflare_account_id = "cf-account-id"
+cloudflare_api_token  = "CFPAT-..." # Pages + DNS edit permissions
+
+pages_project_name = "feifan-dev"
+production_branch  = "main"
+
+github_owner = "amarkwong"
+github_repo  = "feifan.dev"
+
+# List every domain you want Cloudflare Pages to serve.
+custom_domains = [
+  "feifan.dev",
+  "www.feifan.dev",
+]
+
+# When you want Terraform to create DNS records as well, set the zone apex here.
+managed_zone = "feifan.dev"
+pages_cname_proxied = true
+
+# Optional environment variables injected into the Astro build.
+production_env_vars = {
+  NOTION_API_KEY    = "secret"
+  NOTION_DATABASE_ID = "secret"
+}
+
+preview_env_vars = {
+  NOTION_API_KEY    = "secret"
+  NOTION_DATABASE_ID = "secret"
+}

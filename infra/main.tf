@@ -18,7 +18,11 @@ locals {
     NODE_VERSION = var.node_version
   }
 
-  pages_cname_target = "${cloudflare_pages_project.site.subdomain}.pages.dev"
+  pages_cname_target = (
+    endswith(cloudflare_pages_project.site.subdomain, ".pages.dev")
+      ? cloudflare_pages_project.site.subdomain
+      : "${cloudflare_pages_project.site.subdomain}.pages.dev"
+  )
 }
 
 data "cloudflare_zone" "managed" {
@@ -44,7 +48,6 @@ resource "cloudflare_pages_project" "site" {
   build_config {
     build_command   = var.build_command
     destination_dir = var.build_output_dir
-    framework       = "astro"
     root_dir        = var.project_root
   }
 
@@ -87,6 +90,6 @@ resource "cloudflare_record" "pages_cname" {
   name    = each.value == var.managed_zone ? "@" : trimsuffix(each.value, ".${var.managed_zone}")
   type    = "CNAME"
   value   = local.pages_cname_target
-  proxied = true
+  proxied = var.pages_cname_proxied
   ttl     = 1
 }

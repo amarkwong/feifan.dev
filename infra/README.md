@@ -13,7 +13,7 @@ This folder contains Terraform configuration that provisions a Cloudflare Pages 
 
 ## Customization
 
-Set variables either via a `terraform.tfvars` file, CLI flags, or environment variables with the `TF_VAR_` prefix.
+Set variables either via a `terraform.tfvars` file (start from `terraform.tfvars.example`), CLI flags, or environment variables with the `TF_VAR_` prefix.
 
 Common variables:
 
@@ -26,6 +26,7 @@ Common variables:
 | `github_owner` / `github_repo` | Repository coordinates | `amarkwong` / `feifan.dev` |
 | `custom_domains` | Optional list of custom domains (apex + www) | `[]` |
 | `managed_zone` | Apex domain in Cloudflare DNS to manage records for | `""` |
+| `pages_cname_proxied` | Whether Terraform-created CNAMEs are orange-cloud proxied | `true` |
 | `production_env_vars` / `preview_env_vars` | Maps of environment variables (e.g., `NOTION_TOKEN`) | `{}` |
 
 Example `terraform.tfvars`:
@@ -53,9 +54,9 @@ terraform apply
 
 ### What gets created
 
-- `cloudflare_pages_project.site`: Configures the Pages project with Astro build settings and connects the GitHub repo/branch.
+- `cloudflare_pages_project.site`: Configures the Pages project with Astro-friendly build settings (Cloudflare auto-detects the framework) and connects the GitHub repo/branch.
 - `cloudflare_pages_domain.custom`: Adds each domain in `custom_domains` to the project (DNS records must already resolve to Cloudflare).
-- `cloudflare_record.pages_cname`: (Optional) When `managed_zone` is set, creates proxied CNAME records pointing the apex/`www` at `<project>.pages.dev` so verification succeeds automatically.
+- `cloudflare_record.pages_cname`: (Optional) When `managed_zone` is set, creates CNAME records pointing the apex/`www` at `<project>.pages.dev`. Control whether they’re proxied via `pages_cname_proxied` (set to `false` if you need DNS-only until Cloudflare finishes verifying the custom host).
 
 > **Tip:** Set `custom_domains = ["feifan.dev", "www.feifan.dev"]` and `managed_zone = "feifan.dev"` to create both records. Additional subdomains must belong to the same zone.
 
