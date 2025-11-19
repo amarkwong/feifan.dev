@@ -4,61 +4,78 @@ import ExperienceTimeline from '../components/ExperienceTimeline.astro';
 
 const experience = [
   {
-    company: 'Flight Centre',
-    role: 'Front-End Engineer',
-    period: '2024 — Present',
-    year: '2024',
-    summary:
-      'Leading the rebuild of booking flows with Astro islands and edge rendering, cutting TTFB by 35% while keeping accessibility pristine.',
-  technologies: ['Astro', 'React', 'Tailwind', 'Edge Functions'],
-    projects: [
-      {
-        name: 'Trips Booking OS',
-        description: 'Modular booking portal that merges flights + hotels into a single quoteable flow with real-time fare validation.',
-      },
-      {
-        name: 'Loyalty Compass',
-        description: 'Dashboard that surfaces live loyalty inventory and upsell nudges across 40+ markets.',
-      },
-    ],
-  },
-  {
-    company: 'Acme Corp',
-    role: 'Full-Stack Developer',
-    period: '2022 — 2024',
+    company: 'Independent Consultant',
+    role: 'Freelance Engineer & Advisor',
+    period: '2022 — Present',
     year: '2022',
     summary:
-      'Shipped internal tooling for 500+ operators, modernizing a legacy stack into type-safe services and reusable UI primitives.',
-  technologies: ['Next.js', 'Node.js', 'Postgres', 'AWS'],
+      'Partnering with founders and SMEs to prototype finance and energy tooling, blending Julia models, Next.js frontends, and Notion automations into shippable insights.',
+    technologies: ['Next.js', 'Notion API', 'Julia', 'Vercel'],
     projects: [
       {
-        name: 'Ops Control Tower',
-        description: 'Multi-tenant workflow tool with fine-grained permissions, 8x faster ticket triage, and live SLA tracking.',
+        name: 'Energy Rates Advisor',
+        description: 'Julia-backed calculator that mirrors ERSA pricing logic so customers can explore tariffs and solar scenarios in minutes.',
       },
       {
-        name: 'Signals API',
-        description: 'Event-driven analytics pipeline exposing customer health signals to downstream tooling.',
+        name: 'Notion Delivery Hub',
+        description: 'Notion + Next.js playbook that centralizes project docs, automated reminders, and embedded forms for boutique clients.',
       },
     ],
   },
   {
-    company: 'Independent',
-    role: 'Product Engineer',
-    period: '2018 — 2022',
-    year: '2018',
+    company: 'Edge2020 (Edge Energy Services)',
+    role: 'Senior IT Developer & Analyst',
+    period: '2019 — 2022',
+    year: '2019',
     summary:
-      'Partnered with startups to design and build minimal web experiences—from analytics dashboards to rapid landing-page experiments.',
-  technologies: ['Astro', 'Remix', 'Cloudflare', 'Design Systems'],
+      'Led the modernization of the Edge client portal, TEEMS back office, and internal calculators, translating ERSA rules into resilient Azure-first services.',
+    technologies: ['Azure Functions', 'Next.js', 'SQL Managed Instance', 'Power BI'],
     projects: [
       {
-        name: 'Astro Portfolio',
-        description: 'This minimalist site built to test drive Astro content collections, MDX, and edge-friendly deployment.',
-        href: 'https://github.com/feifan/astro-portfolio',
+        name: 'Client Portal Modernization',
+        description: 'Refreshed portal.edgeenergyservices.com.au with modular UI, role-specific workflows, and integrated rate calculators.',
       },
       {
-        name: 'Map Extension',
-        description: 'Chrome extension overlaying saved routes and commute insights directly onto Google Maps.',
-        href: 'https://github.com/feifan/map-extension',
+        name: '5MS Data Pipeline',
+        description: 'Built meter and pricing processors for the Five-Minute Settlement reform, ensuring clean data ingestion and reporting.',
+      },
+    ],
+  },
+  {
+    company: 'JR Academy',
+    role: 'Full Stack Web Developer',
+    period: '2018 — 2019',
+    year: '2018',
+    summary:
+      'Shipped features across the public site and learning platform using React, Redux, .NET APIs, and AWS to speed enrolment and content delivery.',
+    technologies: ['React', 'Redux', '.NET Core', 'AWS EC2'],
+    projects: [
+      {
+        name: 'Learning Platform Revamp',
+        description: 'Updated learn.jiangren.com.au with responsive modules, SSO, and performance optimizations backed by .NET services.',
+      },
+      {
+        name: 'Enrollment Automation',
+        description: 'Introduced workflows that sync course registrations with CRM and reporting via AWS-hosted microservices.',
+      },
+    ],
+  },
+  {
+    company: 'China Industrial Bank',
+    role: 'Software Engineer',
+    period: '2008 — 2013',
+    year: '2008',
+    summary:
+      'Engineered high-availability services for the bank’s core transaction system with C, embedded SQL, and Tuxedo middleware on AIX.',
+    technologies: ['C', 'Embedded SQL', 'Tuxedo', 'AIX'],
+    projects: [
+      {
+        name: 'Availability Monitor System',
+        description: 'Developed bash + awk monitoring that tracks middleware health and alerts ops teams before outages.',
+      },
+      {
+        name: 'Transaction Middleware Hardening',
+        description: 'Optimized Tuxedo/WebLogic services and MQ integrations to keep SLA-critical workloads stable at scale.',
       },
     ],
   },
