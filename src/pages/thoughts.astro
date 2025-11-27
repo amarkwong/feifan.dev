@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { fetchNotionArticle, fetchChildPages } from '../lib/notion';
+import { deriveNotionEmbedSrc, deriveNotionSlug, normalizeNotionId } from '../lib/notionEmbed';
 import { blogEntries, blogCollections } from '../data/blogEntries';
 
 interface WritingCard {
@@ -9,6 +10,10 @@ interface WritingCard {
   status: string;
   href: string;
   updatedAt: string;
+  slug?: string;
+  notionPageId?: string;
+  normalizedPageId?: string | null;
+  embedSrc?: string | null;
 }
 
 const fallbackEssays: WritingCard[] = [
@@ -66,13 +71,25 @@ async function fetchBlogHighlights(limit = 6): Promise<WritingCard[]> {
         const article = await fetchNotionArticle(entry.notionPageId);
         if (!article) return null;
         const summary = entry.summary || summarizeHtml(article.content ?? '');
+        const normalizedId = normalizeNotionId(entry.notionPageId);
+        const slug = deriveNotionSlug({
+          publicUrl: article.publicUrl,
+          title: article.title,
+          fallbackSlug: entry.slug,
+          pageId: entry.notionPageId,
+        });
+        const embedSrc = deriveNotionEmbedSrc(article.publicUrl, entry.notionPageId);
         return {
           title: ensureTitle(article.title, entry.titleOverride, entry.slug),
           summary: summary || 'Read this piece on Notion.',
           status: toStatusLabel(entry.tags?.[0]),
           href: article.publicUrl || `/blog/${entry.slug}`,
+          slug,
+          notionPageId: entry.notionPageId,
+          normalizedPageId: normalizedId,
+          embedSrc,
           updatedAt: article.updatedAt ?? new Date().toISOString(),
-        } satisfies WritingCard;
+        } as WritingCard;
       })
     );
 
@@ -85,13 +102,25 @@ async function fetchBlogHighlights(limit = 6): Promise<WritingCard[]> {
               const article = await fetchNotionArticle(child.id);
               if (!article) return null;
               const summary = summarizeHtml(article.content ?? '') || collection.summary;
+              const normalizedId = normalizeNotionId(child.id);
+              const slug = deriveNotionSlug({
+                publicUrl: article.publicUrl || child.publicUrl,
+                title: article.title ?? child.title,
+                fallbackSlug: child.title,
+                pageId: child.id,
+              });
+              const embedSrc = deriveNotionEmbedSrc(article.publicUrl || child.publicUrl, child.id);
               return {
                 title: ensureTitle(article.title, child.title),
                 summary: summary || 'Read this piece on Notion.',
                 status: toStatusLabel(collection.tags?.[0]),
                 href: article.publicUrl || child.publicUrl || `/blog/${child.id}`,
+                slug,
+                notionPageId: child.id,
+                normalizedPageId: normalizedId,
+                embedSrc,
                 updatedAt: article.updatedAt ?? new Date().toISOString(),
-              } satisfies WritingCard;
+              } as WritingCard;
             })
           );
         })
@@ -113,44 +142,44 @@ const essays = blogHighlights.length ? blogHighlights : fallbackEssays;
 
 const signalBoosts = [
   {
-    title: 'Lightning talk · CascadiaJS',
-    detail: 'Measuring micro-interactions with the Vitals API (slides + demo repo).',
-    href: 'https://speakerdeck.com/feifan/micro-interactions',
+    title: 'Office hours · Energy analysts',
+    detail: 'Monthly sessions reverse-engineering ERSA pricing flows and TEEMS data hygiene.',
+    href: 'mailto:hi@feifan.dev?subject=Energy%20office%20hours',
   },
   {
-    title: 'Guest on Frontend First',
-    detail: 'Chatting about Astro, composable timelines, and intentional DX.',
-    href: 'https://frontendfirst.fm/astro-timelines',
+    title: 'Case study · Edge portal modernization',
+    detail: 'Architecture notes on porting calculators and workflows onto Azure Functions + SQL Managed Instance.',
+    href: '/thoughts',
   },
   {
-    title: 'Workshop · Plotting performance budgets',
-    detail: 'Hands-on session for teams adopting Astro islands at scale.',
-    href: 'mailto:hi@feifan.dev?subject=Performance%20Workshop',
+    title: 'Toolkit · Notion delivery hub',
+    detail: 'An ops template that keeps boutique consultancies in sync across briefs, docs, and Julia experiments.',
+    href: 'mailto:hi@feifan.dev?subject=Notion%20delivery%20hub',
   },
 ];
 
 const readingList = [
   {
-    title: 'Creative Selection',
-    author: 'Ken Kocienda',
-    note: 'Rapid iteration stories that inspire my prototyping cadence.',
+    title: 'Shorting the Grid',
+    author: 'Meredith Angwin',
+    note: 'Grounding Australian energy-market conversations in practical reliability history.',
   },
   {
-    title: 'Designing Data-Intensive Applications',
-    author: 'Martin Kleppmann',
-    note: 'Required reading for thoughtful system boundaries.',
+    title: 'Numbers Don’t Lie',
+    author: 'Vaclav Smil',
+    note: 'Keeps modeling instincts anchored in real-world energy + infrastructure data.',
   },
   {
-    title: 'The Creative Act',
-    author: 'Rick Rubin',
-    note: 'A reminder to protect the quiet headspace where ideas form.',
+    title: 'Shape Up',
+    author: 'Ryan Singer',
+    note: 'Guides how I frame six-week consulting arcs for SMEs.',
   },
 ];
 
 const nowFocus = [
-  'Documenting an Astro + Cloudflare edge starter.',
-  'Sketching calm animation patterns for booking flows.',
-  'Hosting monthly office hours for early-stage founders.',
+  'Prototyping Julia models that forecast DER scenarios for boutique retailers.',
+  'Automating TEEMS ⇄ Notion handoffs so ops teams get cleaner briefs.',
+  'Documenting migration patterns from monolithic portals to Azure Functions.',
 ];
 ---
 
@@ -175,22 +204,42 @@ const nowFocus = [
     </div>
     <div class="carousel" data-carousel>
       <button class="carousel-control" data-dir="prev" aria-label="Show previous writing">
-        &lt;
+        <span class="sr-only">Show previous writing</span>
+        <svg viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M12.5 5l-5 5 5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+        </svg>
       </button>
       <div class="carousel-track" data-carousel-track>
-        {essays.map((essay) => (
-          <article class="essay-card">
-            <span class="essay-status">{essay.status}</span>
-            <h3><a href={essay.href}>{essay.title}</a></h3>
-            <p>{essay.summary}</p>
-            <a class="ghost-link" href={essay.href}>
-              Read the piece ↗
-            </a>
-          </article>
-        ))}
+        {essays.map((essay) => {
+          const hasEmbed = Boolean(essay.slug && essay.notionPageId && essay.embedSrc);
+          const articleHref = hasEmbed ? `/thoughts/${essay.slug}` : essay.href;
+          return (
+            <article class="essay-card">
+              <span class="essay-status">{essay.status}</span>
+              <h3>
+                <a href={articleHref} transition:animate={hasEmbed ? 'fade' : undefined} target={hasEmbed ? undefined : '_blank'} rel={hasEmbed ? undefined : 'noreferrer'}>
+                  {essay.title}
+                </a>
+              </h3>
+              <p>{essay.summary}</p>
+              <a
+                class="ghost-link"
+                href={articleHref}
+                transition:animate={hasEmbed ? 'fade' : undefined}
+                target={hasEmbed ? undefined : '_blank'}
+                rel={hasEmbed ? undefined : 'noreferrer'}
+              >
+                Read the piece ↗
+              </a>
+            </article>
+          );
+        })}
       </div>
       <button class="carousel-control" data-dir="next" aria-label="Show next writing">
-        &gt;
+        <span class="sr-only">Show next writing</span>
+        <svg viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M7.5 5l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+        </svg>
       </button>
     </div>
   </section>
@@ -234,22 +283,6 @@ const nowFocus = [
       ))}
     </ul>
   </section>
-
-  <section class="thoughts-section thoughts-section--cta glass-panel">
-    <div>
-      <h2>Let’s swap ideas</h2>
-      <p>
-        I host casual office hours every month for founders, product leaders, and creative technologists.
-        Bring a prototype, a question, or a hunch. I will bring candor and sketches.
-      </p>
-    </div>
-    <div class="cta-actions">
-      <a class="hero-cta" href="mailto:hi@feifan.dev?subject=Book%20office%20hours">Book a slot</a>
-      <a class="hero-secondary" href="https://tinyletter.com/feifan" target="_blank" rel="noreferrer">
-        Subscribe for updates
-      </a>
-    </div>
-  </section>
 </Layout>
 
 <script is:inline>
@@ -257,25 +290,26 @@ const nowFocus = [
     document.querySelectorAll('[data-carousel]').forEach((carousel) => {
       const track = carousel.querySelector('[data-carousel-track]');
       if (!(track instanceof HTMLElement)) return;
-      const updateButtons = () => {
-        const maxScroll = track.scrollWidth - track.clientWidth;
-        carousel.querySelectorAll('[data-dir="prev"]').forEach((btn) => {
-          if (btn instanceof HTMLButtonElement) {
-            btn.disabled = track.scrollLeft <= 0;
+
+      const rotate = (direction) => {
+        if (direction === 'prev') {
+          const last = track.lastElementChild;
+          if (last) {
+            track.insertBefore(last, track.firstElementChild);
           }
-        });
-        carousel.querySelectorAll('[data-dir="next"]').forEach((btn) => {
-          if (btn instanceof HTMLButtonElement) {
-            btn.disabled = track.scrollLeft >= maxScroll - 1;
+        } else if (direction === 'next') {
+          const first = track.firstElementChild;
+          if (first) {
+            track.appendChild(first);
           }
-        });
+        }
+        track.scrollLeft = 0;
       };
 
-      const scrollByCard = (direction) => {
-        const firstCard = track.querySelector('.essay-card');
-        const cardWidth = firstCard instanceof HTMLElement ? firstCard.offsetWidth : track.clientWidth;
-        const gap = parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap || '24');
-        track.scrollBy({ left: (cardWidth + gap) * direction, behavior: 'smooth' });
+      const handleControl = (dir) => {
+        if (dir === 'prev' || dir === 'next') {
+          rotate(dir);
+        }
       };
 
       carousel.addEventListener('click', (event) => {
@@ -283,18 +317,19 @@ const nowFocus = [
         const control = origin instanceof Element ? origin.closest('[data-dir]') : null;
         if (!(control instanceof HTMLElement)) return;
         const dir = control.getAttribute('data-dir');
-        if (dir === 'prev') {
-          scrollByCard(-1);
-        } else if (dir === 'next') {
-          scrollByCard(1);
+        handleControl(dir);
+      });
+
+      carousel.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowLeft') {
+          event.preventDefault();
+          handleControl('prev');
+        }
+        if (event.key === 'ArrowRight') {
+          event.preventDefault();
+          handleControl('next');
         }
       });
-
-      track.addEventListener('scroll', () => {
-        window.requestAnimationFrame(updateButtons);
-      });
-
-      updateButtons();
     });
   });
 </script>
@@ -358,6 +393,18 @@ const nowFocus = [
     gap: 1.25rem;
   }
 
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
   .thoughts-section--carousel {
     position: relative;
   }
@@ -368,12 +415,15 @@ const nowFocus = [
   }
 
   .carousel-track {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(260px, 1fr);
+    display: flex;
+    flex-wrap: nowrap;
     gap: 1.25rem;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
     scroll-behavior: smooth;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
 
   .carousel-track::-webkit-scrollbar {
@@ -387,13 +437,22 @@ const nowFocus = [
     border-radius: 999px;
     width: 2.5rem;
     height: 2.5rem;
-    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
     cursor: pointer;
     transition: transform 0.2s ease, opacity 0.2s ease;
     position: absolute;
     top: 50%;
     transform: translate(-50%, -50%);
     z-index: 2;
+  }
+
+  .carousel-control svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    pointer-events: none;
   }
 
   .carousel-control[data-dir='prev'] {
@@ -438,6 +497,8 @@ const nowFocus = [
     flex-direction: column;
     gap: 0.5rem;
     min-height: 200px;
+    flex: 0 0 clamp(280px, 55vw, 420px);
+    scroll-snap-align: start;
   }
 
   .essay-status {
@@ -519,19 +580,6 @@ const nowFocus = [
     background: rgba(0, 0, 0, 0.02);
   }
 
-  .thoughts-section--cta {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 2.5rem;
-  }
-
-  .cta-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-
   @media (max-width: 720px) {
     .thoughts-hero {
       padding: 2.25rem;
@@ -542,8 +590,10 @@ const nowFocus = [
       margin-top: 0.75rem;
     }
     .carousel-track {
-      grid-auto-columns: minmax(240px, 1fr);
-      overflow-x: auto;
+      gap: 1rem;
+    }
+    .essay-card {
+      flex-basis: min(85vw, 360px);
     }
   }
 </style>

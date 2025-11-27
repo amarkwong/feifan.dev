@@ -3,10 +3,29 @@ import Layout from '../layouts/Layout.astro';
 import ExperienceTimeline from '../components/ExperienceTimeline.astro';
 
 const experience = [
+   {
+    company: 'Senior Full Stack Developer',
+    role: 'Freelance Engineer & Advisor',
+    period: '2022 — Present',
+    year: '2022',
+    summary:
+      ' with founders and SMEs to prototype finance and energy tooling, blending Julia models, Next.js frontends, and Notion automations into shippable insights.',
+    technologies: ['Next.js', 'Notion API', 'Julia', 'Vercel'],
+    projects: [
+      {
+        name: 'Energy Rates Advisor',
+        description: 'Julia-backed calculator that mirrors ERSA pricing logic so customers can explore tariffs and solar scenarios in minutes.',
+      },
+      {
+        name: 'Notion Delivery Hub',
+        description: 'Notion + Next.js playbook that centralizes project docs, automated reminders, and embedded forms for boutique clients.',
+      },
+    ],
+  },
   {
     company: 'Independent Consultant',
     role: 'Freelance Engineer & Advisor',
-    period: '2022 — Present',
+    period: '2022',
     year: '2022',
     summary:
       'Partnering with founders and SMEs to prototype finance and energy tooling, blending Julia models, Next.js frontends, and Notion automations into shippable insights.',
@@ -84,25 +103,29 @@ const experience = [
 
 <Layout title="feifan.dev">
   <header class="hero glass-panel">
-    <span class="chip">Currently building for the web</span>
-    <h1>Feifan crafts calm, high-impact digital experiences.</h1>
+    <span class="chip">Energy + finance focused engineer</span>
+    <h1>Feifan designs resilient tooling for founders and operators.</h1>
     <p>
-      Front-of-the-frontend engineer obsessed with razor-sharp performance, thoughtful motion,
-      and joyful tooling. I distill complex systems into focused, human interfaces.
+      Freelance full-stack developer translating ERSA pricing rules, learning platforms, and bank-grade
+      workflows into approachable web apps powered by Julia models, Next.js frontends, and Azure/AWS infra.
     </p>
     <div class="hero-links">
-      <a class="hero-cta" href="#experience">View experience timeline</a>
-      <a class="hero-secondary" href="/thoughts">Visit the thoughts hub</a>
-      <a class="hero-secondary" href="mailto:hi@feifan.dev">Get in touch</a>
+      <a class="hero-cta" href="#experience">Browse recent work</a>
+      <a class="hero-secondary" href="/thoughts">Read field notes</a>
+      <a class="hero-secondary" href="mailto:hi@feifan.dev?subject=Project%20chat">Book a call</a>
     </div>
   </header>
 
   <section id="about">
     <h2>About</h2>
     <p>
-      Hi, I’m Feifan—a software engineer passionate about minimal, performant web
-      experiences. I build, I learn, I share.
-      Long-form notes now live on <a href="/thoughts">the Thoughts page</a> for folks who want to dive deeper.
+      Hi, I’m Feifan—a Brisbane-based engineer who has tuned energy calculators at Edge2020,
+      scaled learning platforms for JR Academy, and now partners with SMEs to blend analytics with calm UX.
+      I love distilling dense models into tools that teammates actually enjoy using.
+    </p>
+    <p>
+      These days I split time between Julia prototyping, Next.js delivery, and ops automation inside Notion.
+      Longer essays and lab notes live on <a href="/thoughts">the Thoughts page</a> if you’d like the details.
     </p>
   </section>
 
