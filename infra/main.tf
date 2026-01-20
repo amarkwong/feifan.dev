@@ -153,9 +153,21 @@ resource "cloudflare_worker_script" "vercel_proxy" {
   module = true
 }
 
+locals {
+  # Flatten the route patterns into a map of {app_name-index => {app, pattern}}
+  vercel_proxy_routes = merge([
+    for app, config in var.vercel_proxies : {
+      for idx, pattern in config.route_patterns : "${app}-${idx}" => {
+        app     = app
+        pattern = pattern
+      }
+    }
+  ]...)
+}
+
 resource "cloudflare_worker_route" "vercel_proxy" {
-  for_each    = var.vercel_proxies
+  for_each    = local.vercel_proxy_routes
   zone_id     = local.managed_zone_id
-  pattern     = each.value.route_pattern
-  script_name = cloudflare_worker_script.vercel_proxy[each.key].name
+  pattern     = each.value.pattern
+  script_name = cloudflare_worker_script.vercel_proxy[each.value.app].name
 }

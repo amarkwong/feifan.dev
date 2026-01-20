@@ -35,7 +35,7 @@ preview_env_vars = {
 # Leave empty {} to disable all workers
 vercel_proxies = {
   arcade = {
-    vercel_url    = "https://arcade-xxx.vercel.app"
+    vercel_url    = "https://arcade-web-topaz.vercel.app"
     route_pattern = "feifan.dev/arcade/*"
   }
   geopin = {
