@@ -105,6 +105,20 @@ resource "cloudflare_worker_script" "vercel_proxy" {
         const url = new URL(request.url);
         const pathname = url.pathname;
         const prefix = "/${each.key}";
+        const origin = request.headers.get("Origin") || url.origin;
+
+        // Handle CORS preflight
+        if (request.method === "OPTIONS") {
+          return new Response(null, {
+            status: 204,
+            headers: {
+              "Access-Control-Allow-Origin": origin,
+              "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+              "Access-Control-Allow-Headers": request.headers.get("Access-Control-Request-Headers") || "*",
+              "Access-Control-Max-Age": "86400",
+            },
+          });
+        }
 
         if (!pathname.startsWith(prefix)) {
           return fetch(request);
@@ -122,6 +136,11 @@ resource "cloudflare_worker_script" "vercel_proxy" {
         });
 
         const response = await fetch(proxyRequest);
+        const newHeaders = new Headers(response.headers);
+
+        // Set CORS headers
+        newHeaders.set("Access-Control-Allow-Origin", origin);
+        newHeaders.set("Access-Control-Allow-Credentials", "true");
 
         if (response.status >= 300 && response.status < 400) {
           const location = response.headers.get("Location");
@@ -129,18 +148,16 @@ resource "cloudflare_worker_script" "vercel_proxy" {
             const locationUrl = new URL(location, env.VERCEL_TARGET);
             if (locationUrl.origin === new URL(env.VERCEL_TARGET).origin) {
               const newLocation = prefix + locationUrl.pathname + locationUrl.search;
-              const newHeaders = new Headers(response.headers);
               newHeaders.set("Location", newLocation);
-              return new Response(response.body, {
-                status: response.status,
-                statusText: response.statusText,
-                headers: newHeaders,
-              });
             }
           }
         }
 
-        return response;
+        return new Response(response.body, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: newHeaders,
+        });
       },
     };
   EOF
