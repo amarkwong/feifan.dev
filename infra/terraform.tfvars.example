@@ -30,16 +30,3 @@ preview_env_vars = {
   NOTION_API_KEY    = "secret"
   NOTION_DATABASE_ID = "secret"
 }
-
-# Vercel proxy workers - routes subpaths to Vercel apps
-# Leave empty {} to disable all workers
-vercel_proxies = {
-  arcade = {
-    vercel_url    = "https://arcade-web-topaz.vercel.app"
-    route_pattern = "feifan.dev/arcade/*"
-  }
-  geopin = {
-    vercel_url    = "https://mapguess.vercel.app"
-    route_pattern = "feifan.dev/geopin/*"
-  }
-}

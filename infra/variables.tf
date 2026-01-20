@@ -113,12 +113,3 @@ variable "primary_domain" {
   default     = ""
 }
 
-# Vercel proxy workers - routes subpaths to Vercel apps
-variable "vercel_proxies" {
-  type = map(object({
-    vercel_url     = string
-    route_patterns = list(string)
-  }))
-  description = "Map of Vercel proxy configurations. Key is the app name, value contains vercel_url and route_patterns (list)."
-  default     = {}
-}
