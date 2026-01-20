@@ -16,7 +16,16 @@ pnpm-debug.log*
 # environment variables
 .env
 .env.production
+
+# terraform
 infra/terraform.tfvars
+infra/terraform.tfstate
+infra/terraform.tfstate.backup
+infra/.terraform/
+
+# playwright
+playwright-report/
+test-results/
 
 # macOS-specific files
 .DS_Store

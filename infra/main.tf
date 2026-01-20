@@ -93,3 +93,69 @@ resource "cloudflare_record" "pages_cname" {
   proxied = var.pages_cname_proxied
   ttl     = 1
 }
+
+# Vercel Proxy Workers - routes feifan.dev/<app>/* to Vercel deployments
+resource "cloudflare_worker_script" "vercel_proxy" {
+  for_each   = var.vercel_proxies
+  account_id = var.cloudflare_account_id
+  name       = "${each.key}-proxy"
+  content    = <<-EOF
+    export default {
+      async fetch(request, env) {
+        const url = new URL(request.url);
+        const pathname = url.pathname;
+        const prefix = "/${each.key}";
+
+        if (!pathname.startsWith(prefix)) {
+          return fetch(request);
+        }
+
+        const targetPath = pathname.slice(prefix.length) || "/";
+        const targetUrl = new URL(targetPath, env.VERCEL_TARGET);
+        targetUrl.search = url.search;
+
+        const proxyRequest = new Request(targetUrl.toString(), {
+          method: request.method,
+          headers: request.headers,
+          body: request.body,
+          redirect: "manual",
+        });
+
+        const response = await fetch(proxyRequest);
+
+        if (response.status >= 300 && response.status < 400) {
+          const location = response.headers.get("Location");
+          if (location) {
+            const locationUrl = new URL(location, env.VERCEL_TARGET);
+            if (locationUrl.origin === new URL(env.VERCEL_TARGET).origin) {
+              const newLocation = prefix + locationUrl.pathname + locationUrl.search;
+              const newHeaders = new Headers(response.headers);
+              newHeaders.set("Location", newLocation);
+              return new Response(response.body, {
+                status: response.status,
+                statusText: response.statusText,
+                headers: newHeaders,
+              });
+            }
+          }
+        }
+
+        return response;
+      },
+    };
+  EOF
+
+  plain_text_binding {
+    name = "VERCEL_TARGET"
+    text = each.value.vercel_url
+  }
+
+  module = true
+}
+
+resource "cloudflare_worker_route" "vercel_proxy" {
+  for_each    = var.vercel_proxies
+  zone_id     = local.managed_zone_id
+  pattern     = each.value.route_pattern
+  script_name = cloudflare_worker_script.vercel_proxy[each.key].name
+}

@@ -112,3 +112,13 @@ variable "primary_domain" {
   description = "Optional helper: the apex domain for outputs"
   default     = ""
 }
+
+# Vercel proxy workers - routes subpaths to Vercel apps
+variable "vercel_proxies" {
+  type = map(object({
+    vercel_url    = string
+    route_pattern = string
+  }))
+  description = "Map of Vercel proxy configurations. Key is the app name, value contains vercel_url and route_pattern."
+  default     = {}
+}
