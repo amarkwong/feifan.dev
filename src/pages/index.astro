@@ -4,47 +4,82 @@ import ExperienceTimeline from '../components/ExperienceTimeline.astro';
 
 const experience = [
   {
-    company: 'Independent Consultant',
-    role: 'Freelance Engineer & Advisor',
-    period: '2022 — Present',
+    company: 'Flight Centre',
+    role: 'Senior Full-Stack Developer',
+    period: 'Nov 2022 — Present',
     year: '2022',
     summary:
-      'Partnering with founders and SMEs to prototype finance and energy tooling, blending Julia models, Next.js frontends, and Notion automations into shippable insights.',
-    technologies: ['Next.js', 'Notion API', 'Julia', 'Vercel'],
+      'Senior contributor across core booking, document, and communication platforms, delivering scalable production systems and mentoring developers across the team.',
+    technologies: ['Node.js', 'TypeScript', 'AWS Bedrock', 'GitHub Copilot', 'Event-Driven Architecture'],
     projects: [
       {
-        name: 'Energy Rates Advisor',
-        description: 'Julia-backed calculator that mirrors ERSA pricing logic so customers can explore tariffs and solar scenarios in minutes.',
+        name: 'Multi-Brand Document Service',
+        description: 'Delivered and maintained a multi-brand, multi-region document generation service with compliance coverage across markets.',
       },
       {
-        name: 'Notion Delivery Hub',
-        description: 'Notion + Next.js playbook that centralizes project docs, automated reminders, and embedded forms for boutique clients.',
+        name: 'Customer Notification Platform',
+        description: 'Built immediate and scheduled customer communication workflows with end-to-end testing for reliable message delivery.',
+      },
+      {
+        name: 'Collaborative Booking Platform',
+        description: 'Contributed to an event-driven booking platform enabling multiple consultants to work on the same booking or quote.',
+      },
+      {
+        name: 'AI-Assisted Delivery',
+        description: 'Delivered AI-assisted features using AWS Bedrock and improved team productivity through GitHub Copilot workflows.',
+      },
+    ],
+  },
+  {
+    company: 'Freelancer',
+    role: 'Freelance Developer & Consultant',
+    period: 'May 2022 — Nov 2022',
+    year: '2022',
+    summary:
+      'Provided engineering services and consulting, with a focus on rapid delivery of small products and technical experiments for clients.',
+    technologies: ['Julia', 'Next.js', 'Notion'],
+    projects: [
+      {
+        name: 'Client Consulting Engagements',
+        description: 'Provided delivery support and technical guidance for customer initiatives.',
+      },
+      {
+        name: 'Side Projects',
+        description: 'Built side projects combining Julia, Next.js, and Notion.',
       },
     ],
   },
   {
     company: 'Edge2020 (Edge Energy Services)',
     role: 'Senior IT Developer & Analyst',
-    period: '2019 — 2022',
+    period: 'Jul 2019 — Apr 2022',
     year: '2019',
     summary:
-      'Led the modernization of the Edge client portal, TEEMS back office, and internal calculators, translating ERSA rules into resilient Azure-first services.',
+      'Maintained and modernized the client portal and TEEMS internal system while translating ERSA logic into practical tooling for operations and account management.',
     technologies: ['Azure Functions', 'Next.js', 'SQL Managed Instance', 'Power BI'],
     projects: [
       {
-        name: 'Client Portal Modernization',
-        description: 'Refreshed portal.edgeenergyservices.com.au with modular UI, role-specific workflows, and integrated rate calculators.',
+        name: 'Portal + TEEMS Improvements',
+        description: 'Maintained and enhanced portal.edgeenergyservices.com.au and TEEMS with new features and workflow automation.',
+      },
+      {
+        name: 'Energy + Environmental Calculators',
+        description: 'Integrated ERSA-aligned energy and environmental rates calculators into internal systems.',
+      },
+      {
+        name: 'Azure Cloud Migration',
+        description: 'Decoupled TaskManager modules to Azure Functions/Logic Apps and migrated databases to SQL Managed Instance.',
       },
       {
         name: '5MS Data Pipeline',
-        description: 'Built meter and pricing processors for the Five-Minute Settlement reform, ensuring clean data ingestion and reporting.',
+        description: 'Built meter and pricing data processors and refactored resources for the move from 30-minute settlement to 5MS.',
       },
     ],
   },
   {
     company: 'JR Academy',
     role: 'Full Stack Web Developer',
-    period: '2018 — 2019',
+    period: 'Jul 2018 — Jun 2019',
     year: '2018',
     summary:
       'Shipped features across the public site and learning platform using React, Redux, .NET APIs, and AWS to speed enrolment and content delivery.',
@@ -63,7 +98,7 @@ const experience = [
   {
     company: 'China Industrial Bank',
     role: 'Software Engineer',
-    period: '2008 — 2013',
+    period: 'Jul 2008 — Aug 2013',
     year: '2008',
     summary:
       'Engineered high-availability services for the bank’s core transaction system with C, embedded SQL, and Tuxedo middleware on AIX.',
@@ -84,11 +119,11 @@ const experience = [
 
 <Layout title="feifan.dev">
   <header class="hero glass-panel">
-    <span class="chip">Energy + finance focused engineer</span>
-    <h1>Feifan designs resilient tooling for founders and operators.</h1>
+    <span class="chip">Senior full-stack engineer</span>
+    <h1>Feifan builds resilient platforms for high-scale product and operations teams.</h1>
     <p>
-      Freelance full-stack developer translating ERSA pricing rules, learning platforms, and bank-grade
-      workflows into approachable web apps powered by Julia models, Next.js frontends, and Azure/AWS infra.
+      Senior Full-Stack Developer at Flight Centre building scalable booking, document, and communication
+      platforms, with hands-on experience across banking systems, energy tooling, and cloud-native delivery.
     </p>
     <div class="hero-links">
       <a class="hero-cta" href="#experience">Browse recent work</a>
@@ -100,13 +135,15 @@ const experience = [
   <section id="about">
     <h2>About</h2>
     <p>
-      Hi, I’m Feifan—a Brisbane-based engineer who has tuned energy calculators at Edge2020,
-      scaled learning platforms for JR Academy, and now partners with SMEs to blend analytics with calm UX.
-      I love distilling dense models into tools that teammates actually enjoy using.
+      Hi, I’m Feifan—a Brisbane-based software engineer currently working at Flight Centre,
+      where I contribute to production-grade platforms and mentor developers across the team.
+      I’ve previously modernized energy systems at Edge2020, delivered learning platforms at JR Academy,
+      and built high-availability transaction services in banking.
     </p>
     <p>
-      These days I split time between Julia prototyping, Next.js delivery, and ops automation inside Notion.
-      Longer essays and lab notes live on <a href="/thoughts">the Thoughts page</a> if you’d like the details.
+      My focus is practical, maintainable software: event-driven architecture, reliable delivery pipelines,
+      and clean developer workflows including AI-assisted engineering. Longer essays and lab notes live on
+      <a href="/thoughts">the Thoughts page</a> if you’d like the details.
     </p>
   </section>
 
