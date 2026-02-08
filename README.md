@@ -13,7 +13,7 @@ The dev server runs on http://localhost:4321 by default.
 
 ## Environment variables
 
-The Thoughts page fetches the “Latest writing” section from a Notion database at build time. Secrets stay outside version control via `.env`.
+The Thoughts page fetches the “Latest writing” section from a Notion database at runtime via Cloudflare Pages Functions (`/api/notion/highlights`). Secrets stay outside version control via `.env`.
 
 1. Duplicate `.env.example` → `.env`.
 2. Fill in the values:
@@ -41,7 +41,7 @@ If either variable is missing the UI gracefully falls back to the hard-coded sam
 
 ## Notion data shape
 
-The helper at `src/lib/notion.ts` expects the database to expose these properties (feel free to rename inside the helper if needed):
+The runtime endpoint at `functions/api/notion/highlights.js` expects the database to expose these properties:
 
 - **Title** (or Name): Title property used for the card heading.
 - **Summary** (rich text): Short description shown under the title.
@@ -49,6 +49,16 @@ The helper at `src/lib/notion.ts` expects the database to expose these propertie
 - **URL** (url): Public link to the post; falls back to the page URL if omitted.
 
 Adjust the mapping as your Notion schema evolves.
+
+## Runtime Notion endpoint
+
+- Route: `/api/notion/highlights?limit=3`
+- Implementation: `functions/api/notion/highlights.js`
+- Cache policy: `s-maxage=900` with `stale-while-revalidate=86400`
+
+This keeps writing cards fresh without requiring a full site rebuild.
+
+Local `astro dev` does not run Cloudflare Functions, so the Thoughts page will show fallback cards unless you run in a Pages-compatible dev environment.
 
 ## Infrastructure (Cloudflare Pages)
 
@@ -59,22 +69,3 @@ Terraform configuration under `infra/` provisions the Cloudflare Pages project, 
 3. Run `terraform init`, `terraform plan`, and `terraform apply` from the `infra/` directory.
 
 Each success will (a) ensure the Pages project references `main` for production builds and (b) register the domains you list in `custom_domains`. Set `managed_zone` (e.g., `feifan.dev`) if you want Terraform to create the necessary proxied CNAME records in Cloudflare DNS automatically.
-
-## Blog slugs sourced from Notion
-
-Static blog routes live under `src/pages/blog/[slug].astro`. You can populate them in two ways via `src/data/blogEntries.ts`:
-
-### Manual entries (`blogEntries`)
-
-1. Duplicate one of the objects in `blogEntries`.
-2. Give it a new slug (used in the URL) and the corresponding Notion page ID.
-3. Share that Notion page with your integration so the build can fetch blocks.
-4. Optionally update the `summary`/`tags` fields for on-page metadata.
-
-### Auto-generated collections (`blogCollections`)
-
-- Add a new object with the parent Notion page ID (often an index page where each child page is an article).
-- When you run `npm run dev` or `npm run build`, Astro fetches all `child_page` blocks under that parent, slugifies their titles, and creates routes automatically. Use `slugPrefix` to namespace the URLs if needed.
-- `tags` and `summary` on the collection act as defaults for every child. The page content itself is pulled live from Notion, so updating or adding subpages requires no code changes—just re-run the build.
-
-During the build the site fetches every referenced page’s blocks, renders headings/lists/quotes/code, and outputs static HTML. If the integration key is missing, the route falls back to a placeholder paragraph reminding you to set up the credentials locally.

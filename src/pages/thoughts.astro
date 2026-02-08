@@ -1,19 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { fetchNotionArticle, fetchChildPages } from '../lib/notion';
-import { deriveNotionEmbedSrc, deriveNotionSlug, normalizeNotionId } from '../lib/notionEmbed';
-import { blogEntries, blogCollections } from '../data/blogEntries';
 
 interface WritingCard {
   title: string;
   summary: string;
   status: string;
   href: string;
-  updatedAt: string;
-  slug?: string;
-  notionPageId?: string;
-  normalizedPageId?: string | null;
-  embedSrc?: string | null;
 }
 
 const fallbackEssays: WritingCard[] = [
@@ -22,123 +14,25 @@ const fallbackEssays: WritingCard[] = [
     summary:
       'A framework for sizing interactive islands, picking the right renderer, and staying honest about the JavaScript tax.',
     status: 'IN PROGRESS',
-    href: '/blog/hydration-budgets',
-    updatedAt: '2024-01-01',
+    href: '/thoughts',
   },
   {
     title: 'Shipping calm dark-mode toggles',
     summary:
       'Design notes from building a preference-aware theme switcher without layout jank or surprise flashes.',
     status: 'PUBLISHED',
-    href: '/blog/calm-dark-mode',
-    updatedAt: '2023-12-15',
+    href: '/thoughts',
   },
   {
     title: 'Designing engineer-friendly rituals',
     summary:
       'Reflections on weekly demos, debugging salons, and other lightweight practices that keep teams curious.',
     status: 'NOTEBOOK',
-    href: '/blog/rituals-for-engineers',
-    updatedAt: '2023-11-05',
+    href: '/thoughts',
   },
 ];
 
-function summarizeHtml(html: string, maxLength = 180) {
-  if (!html) return '';
-  const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-  if (!text) return '';
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength).trimEnd() + '…';
-}
-
-function toStatusLabel(label?: string) {
-  return (label ?? 'Published').toUpperCase();
-}
-
-function ensureTitle(...candidates: Array<string | undefined | null>) {
-  for (const candidate of candidates) {
-    if (candidate && candidate.trim() && candidate.trim().toLowerCase() !== 'untitled') {
-      return candidate.trim();
-    }
-  }
-  return 'Untitled';
-}
-
-async function fetchBlogHighlights(limit = 6): Promise<WritingCard[]> {
-  try {
-    const manualCards = await Promise.all(
-      blogEntries.map(async (entry) => {
-        const article = await fetchNotionArticle(entry.notionPageId);
-        if (!article) return null;
-        const summary = entry.summary || summarizeHtml(article.content ?? '');
-        const normalizedId = normalizeNotionId(entry.notionPageId);
-        const slug = deriveNotionSlug({
-          publicUrl: article.publicUrl,
-          title: article.title,
-          fallbackSlug: entry.slug,
-          pageId: entry.notionPageId,
-        });
-        const embedSrc = deriveNotionEmbedSrc(article.publicUrl, entry.notionPageId);
-        return {
-          title: ensureTitle(article.title, entry.titleOverride, entry.slug),
-          summary: summary || 'Read this piece on Notion.',
-          status: toStatusLabel(entry.tags?.[0]),
-          href: article.publicUrl || `/blog/${entry.slug}`,
-          slug,
-          notionPageId: entry.notionPageId,
-          normalizedPageId: normalizedId,
-          embedSrc,
-          updatedAt: article.updatedAt ?? new Date().toISOString(),
-        } as WritingCard;
-      })
-    );
-
-    const collectionCards = (
-      await Promise.all(
-        blogCollections.map(async (collection) => {
-          const children = await fetchChildPages(collection.parentPageId);
-          return Promise.all(
-            children.map(async (child) => {
-              const article = await fetchNotionArticle(child.id);
-              if (!article) return null;
-              const summary = summarizeHtml(article.content ?? '') || collection.summary;
-              const normalizedId = normalizeNotionId(child.id);
-              const slug = deriveNotionSlug({
-                publicUrl: article.publicUrl || child.publicUrl,
-                title: article.title ?? child.title,
-                fallbackSlug: child.title,
-                pageId: child.id,
-              });
-              const embedSrc = deriveNotionEmbedSrc(article.publicUrl || child.publicUrl, child.id);
-              return {
-                title: ensureTitle(article.title, child.title),
-                summary: summary || 'Read this piece on Notion.',
-                status: toStatusLabel(collection.tags?.[0]),
-                href: article.publicUrl || child.publicUrl || `/blog/${child.id}`,
-                slug,
-                notionPageId: child.id,
-                normalizedPageId: normalizedId,
-                embedSrc,
-                updatedAt: article.updatedAt ?? new Date().toISOString(),
-              } as WritingCard;
-            })
-          );
-        })
-      )
-    ).flat();
-
-    return [...manualCards, ...collectionCards]
-      .filter((card): card is WritingCard => Boolean(card))
-      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-      .slice(0, limit);
-  } catch (error) {
-    console.error('[Thoughts] Failed to fetch blog highlights', error);
-    return [];
-  }
-}
-
-const blogHighlights = await fetchBlogHighlights(3);
-const essays = blogHighlights.length ? blogHighlights : fallbackEssays;
+const essays = fallbackEssays;
 
 const signalBoosts = [
   {
@@ -210,30 +104,20 @@ const nowFocus = [
         </svg>
       </button>
       <div class="carousel-track" data-carousel-track>
-        {essays.map((essay) => {
-          const hasEmbed = Boolean(essay.slug && essay.notionPageId && essay.embedSrc);
-          const articleHref = hasEmbed ? `/thoughts/${essay.slug}` : essay.href;
-          return (
-            <article class="essay-card">
-              <span class="essay-status">{essay.status}</span>
-              <h3>
-                <a href={articleHref} transition:animate={hasEmbed ? 'fade' : undefined} target={hasEmbed ? undefined : '_blank'} rel={hasEmbed ? undefined : 'noreferrer'}>
-                  {essay.title}
-                </a>
-              </h3>
-              <p>{essay.summary}</p>
-              <a
-                class="ghost-link"
-                href={articleHref}
-                transition:animate={hasEmbed ? 'fade' : undefined}
-                target={hasEmbed ? undefined : '_blank'}
-                rel={hasEmbed ? undefined : 'noreferrer'}
-              >
-                Read the piece ↗
+        {essays.map((essay) => (
+          <article class="essay-card">
+            <span class="essay-status">{essay.status}</span>
+            <h3>
+              <a href={essay.href} target="_blank" rel="noreferrer">
+                {essay.title}
               </a>
-            </article>
-          );
-        })}
+            </h3>
+            <p>{essay.summary}</p>
+            <a class="ghost-link" href={essay.href} target="_blank" rel="noreferrer">
+              Read the piece ↗
+            </a>
+          </article>
+        ))}
       </div>
       <button class="carousel-control" data-dir="next" aria-label="Show next writing">
         <span class="sr-only">Show next writing</span>
@@ -287,6 +171,39 @@ const nowFocus = [
 
 <script is:inline>
   document.addEventListener('DOMContentLoaded', () => {
+    const renderCard = (essay) => {
+      const card = document.createElement('article');
+      card.className = 'essay-card';
+
+      const status = document.createElement('span');
+      status.className = 'essay-status';
+      status.textContent = essay.status || 'PUBLISHED';
+      card.appendChild(status);
+
+      const heading = document.createElement('h3');
+      const titleLink = document.createElement('a');
+      titleLink.href = essay.href;
+      titleLink.target = '_blank';
+      titleLink.rel = 'noreferrer';
+      titleLink.textContent = essay.title;
+      heading.appendChild(titleLink);
+      card.appendChild(heading);
+
+      const summary = document.createElement('p');
+      summary.textContent = essay.summary;
+      card.appendChild(summary);
+
+      const cta = document.createElement('a');
+      cta.className = 'ghost-link';
+      cta.href = essay.href;
+      cta.target = '_blank';
+      cta.rel = 'noreferrer';
+      cta.textContent = 'Read the piece ↗';
+      card.appendChild(cta);
+
+      return card;
+    };
+
     document.querySelectorAll('[data-carousel]').forEach((carousel) => {
       const track = carousel.querySelector('[data-carousel-track]');
       if (!(track instanceof HTMLElement)) return;
@@ -331,6 +248,18 @@ const nowFocus = [
         }
       });
     });
+
+    fetch('/api/notion/highlights?limit=3')
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload) => {
+        if (!payload || !Array.isArray(payload.items) || payload.items.length === 0) return;
+        const track = document.querySelector('[data-carousel-track]');
+        if (!(track instanceof HTMLElement)) return;
+        track.replaceChildren(...payload.items.map(renderCard));
+      })
+      .catch((error) => {
+        console.warn('[Thoughts] Runtime Notion fetch failed', error);
+      });
   });
 </script>
 

@@ -27,7 +27,7 @@ Common variables:
 | `custom_domains` | Optional list of custom domains (apex + www) | `[]` |
 | `managed_zone` | Apex domain in Cloudflare DNS to manage records for | `""` |
 | `pages_cname_proxied` | Whether Terraform-created CNAMEs are orange-cloud proxied | `true` |
-| `production_env_vars` / `preview_env_vars` | Maps of environment variables (e.g., `NOTION_TOKEN`) | `{}` |
+| `production_env_vars` / `preview_env_vars` | Maps of environment variables (e.g., `NOTION_API_KEY`, `NOTION_DATABASE_ID`) | `{}` |
 
 Example `terraform.tfvars`:
 
