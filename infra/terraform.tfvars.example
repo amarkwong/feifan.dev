@@ -31,20 +31,29 @@ preview_env_vars = {
   NOTION_DATABASE_ID = "secret"
 }
 
-# --- Resend transactional email (Discount Tracker) ---
-# Sender: Discount Tracker <notifications@giftcards.feifan.dev>
-# Copy the exact record values from Resend → Domains → giftcards.feifan.dev.
-# These are public DNS verification values, not secrets — but never put the
-# Resend API key here; it belongs only to the Discount Tracker runtime.
-# A record is skipped while its value is still "".
-resend_sending_domain        = "giftcards.feifan.dev"
-resend_return_path_subdomain = "send" # match the host shown by Resend
-resend_mx_value              = ""     # placeholder, e.g. "feedback-smtp.<region>.amazonses.com"
-resend_mx_priority           = 10     # match the priority shown by Resend
-resend_spf_value             = ""     # placeholder, e.g. "v=spf1 include:amazonses.com ~all"
-resend_dkim_selector         = "resend"
-resend_dkim_value            = ""     # placeholder: long "p=..." value from Resend
-resend_dmarc_rua             = ""     # optional: mailbox for DMARC aggregate reports
+# --- Resend transactional email ---
+# One entry per sending domain registered in Resend. Copy the exact record
+# values from Resend → Domains → <domain>. These are public DNS verification
+# values, not secrets — but never put the Resend API key here; it belongs
+# only to the consuming application's runtime.
+# A record is skipped while its value is still ""; unset fields use the
+# defaults (mx_priority = 10, dkim_selector = "resend",
+# return_path_subdomain = "send", manage_dmarc = true, dmarc_rua = "").
+resend_sending_domains = {
+  # Discount Tracker <notifications@giftcards.feifan.dev>
+  "giftcards.feifan.dev" = {
+    mx_value   = "" # e.g. "feedback-smtp.<region>.amazonses.com"
+    spf_value  = "" # e.g. "v=spf1 include:amazonses.com ~all"
+    dkim_value = "" # long "p=..." value from Resend
+  }
+  # Default sender on the apex domain.
+  "feifan.dev" = {
+    mx_value     = ""
+    spf_value    = ""
+    dkim_value   = ""
+    manage_dmarc = false # opt out of publishing _dmarc for the apex
+  }
+}
 
 # --- Cloudflare Tunnel (homeserver / Discount Tracker) ---
 # The defaults create a tunnel named "homeserver" routing

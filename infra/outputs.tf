@@ -48,17 +48,19 @@ output "homeserver_tunnel_dns_records" {
 }
 
 output "resend_dns_records" {
-  description = "DNS records created for Resend email verification of the sending subdomain"
+  description = "DNS records managed for Resend email verification, grouped by sending domain"
   value = {
-    for key, records in {
-      return_path_mx = cloudflare_record.resend_return_path_mx
-      spf            = cloudflare_record.resend_spf
-      dkim           = cloudflare_record.resend_dkim
-      dmarc          = cloudflare_record.resend_dmarc
-      } : key => {
-      name  = records[0].hostname
-      type  = records[0].type
-      value = records[0].value
-    } if length(records) > 0
+    for domain in keys(var.resend_sending_domains) : domain => {
+      for kind, records in {
+        return_path_mx = cloudflare_record.resend_return_path_mx
+        spf            = cloudflare_record.resend_spf
+        dkim           = cloudflare_record.resend_dkim
+        dmarc          = cloudflare_record.resend_dmarc
+        } : kind => {
+        name  = records[domain].hostname
+        type  = records[domain].type
+        value = records[domain].value
+      } if contains(keys(records), domain)
+    }
   }
 }

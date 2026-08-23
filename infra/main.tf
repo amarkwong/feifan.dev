@@ -98,68 +98,79 @@ resource "cloudflare_record" "pages_cname" {
   ttl     = 1
 }
 
-# --- Resend transactional email DNS (Discount Tracker) ---
-# Verifies the giftcards.feifan.dev sending subdomain with Resend so the app
-# (hosted separately) can send as "Discount Tracker <notifications@giftcards.feifan.dev>".
-# Record values come from the Resend Domains screen; records whose value is
-# still blank are skipped so a plan/apply never publishes placeholder data.
+# --- Resend transactional email DNS ---
+# Verifies each sending domain registered in Resend. Every key of
+# var.resend_sending_domains gets its own MX/SPF/DKIM (and optionally DMARC)
+# record set, e.g. giftcards.feifan.dev for the Discount Tracker
+# ("Discount Tracker <notifications@giftcards.feifan.dev>") and the apex
+# feifan.dev for the default sender. Record values come from the Resend
+# Domains screen; records whose value is still blank are skipped so a
+# plan/apply never publishes placeholder data.
 
 locals {
-  resend_enabled = local.managed_zone_id != null && var.resend_sending_domain != ""
+  resend_domains = local.managed_zone_id == null ? {} : {
+    for domain, cfg in var.resend_sending_domains : domain => merge(cfg, {
+      # Record-name fragment relative to the managed zone: "giftcards" for
+      # giftcards.feifan.dev, "" for the zone apex itself.
+      relative = domain == var.managed_zone ? "" : trimsuffix(domain, ".${var.managed_zone}")
+      dmarc_value = (
+        cfg.dmarc_rua == ""
+        ? "v=DMARC1; p=none;"
+        : "v=DMARC1; p=none; rua=mailto:${cfg.dmarc_rua};"
+      )
+    })
+    if domain == var.managed_zone || endswith(domain, ".${var.managed_zone}")
+  }
 
-  # Record names relative to the managed zone, e.g. "giftcards" for
-  # giftcards.feifan.dev inside the feifan.dev zone.
-  resend_domain_relative  = trimsuffix(var.resend_sending_domain, ".${var.managed_zone}")
-  resend_return_path_name = "${var.resend_return_path_subdomain}.${local.resend_domain_relative}"
-  resend_dkim_name        = "${var.resend_dkim_selector}._domainkey.${local.resend_domain_relative}"
-  resend_dmarc_name       = "_dmarc.${local.resend_domain_relative}"
-
-  resend_dmarc_value = (
-    var.resend_dmarc_rua == ""
-    ? "v=DMARC1; p=none;"
-    : "v=DMARC1; p=none; rua=mailto:${var.resend_dmarc_rua};"
-  )
+  resend_record_names = {
+    for domain, cfg in local.resend_domains : domain => {
+      return_path = join(".", compact([cfg.return_path_subdomain, cfg.relative]))
+      dkim        = join(".", compact(["${cfg.dkim_selector}._domainkey", cfg.relative]))
+      dmarc       = join(".", compact(["_dmarc", cfg.relative]))
+    }
+  }
 }
 
 resource "cloudflare_record" "resend_return_path_mx" {
-  count = local.resend_enabled && var.resend_mx_value != "" ? 1 : 0
+  for_each = { for domain, cfg in local.resend_domains : domain => cfg if cfg.mx_value != "" }
 
   zone_id  = local.managed_zone_id
-  name     = local.resend_return_path_name
+  name     = local.resend_record_names[each.key].return_path
   type     = "MX"
-  value    = var.resend_mx_value
-  priority = var.resend_mx_priority
+  value    = each.value.mx_value
+  priority = each.value.mx_priority
   ttl      = 1
 }
 
 resource "cloudflare_record" "resend_spf" {
-  count = local.resend_enabled && var.resend_spf_value != "" ? 1 : 0
+  for_each = { for domain, cfg in local.resend_domains : domain => cfg if cfg.spf_value != "" }
 
   zone_id = local.managed_zone_id
-  name    = local.resend_return_path_name
+  name    = local.resend_record_names[each.key].return_path
   type    = "TXT"
-  value   = var.resend_spf_value
+  value   = each.value.spf_value
   ttl     = 1
 }
 
 resource "cloudflare_record" "resend_dkim" {
-  count = local.resend_enabled && var.resend_dkim_value != "" ? 1 : 0
+  for_each = { for domain, cfg in local.resend_domains : domain => cfg if cfg.dkim_value != "" }
 
   zone_id = local.managed_zone_id
-  name    = local.resend_dkim_name
+  name    = local.resend_record_names[each.key].dkim
   type    = "TXT"
-  value   = var.resend_dkim_value
+  value   = each.value.dkim_value
   ttl     = 1
 }
 
-# Conservative monitoring-only DMARC policy scoped to the sending subdomain.
-# Deliberately does not touch the parent feifan.dev domain.
+# Conservative monitoring-only DMARC policy per sending domain. Domains can
+# opt out with manage_dmarc = false (e.g. to leave the apex domain's email
+# policy untouched).
 resource "cloudflare_record" "resend_dmarc" {
-  count = local.resend_enabled ? 1 : 0
+  for_each = { for domain, cfg in local.resend_domains : domain => cfg if cfg.manage_dmarc }
 
   zone_id = local.managed_zone_id
-  name    = local.resend_dmarc_name
+  name    = local.resend_record_names[each.key].dmarc
   type    = "TXT"
-  value   = local.resend_dmarc_value
+  value   = each.value.dmarc_value
   ttl     = 1
 }

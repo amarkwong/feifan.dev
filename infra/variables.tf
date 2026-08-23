@@ -114,57 +114,33 @@ variable "primary_domain" {
 }
 
 
-# --- Resend transactional email DNS (Discount Tracker) ---
+# --- Resend transactional email DNS ---
 # Values below are DNS verification data published publicly once applied, so
 # they are intentionally not marked sensitive. The Resend API key is NOT a
-# Terraform input; it lives only in the Discount Tracker runtime.
+# Terraform input; it lives only in each application's runtime.
 
-variable "resend_sending_domain" {
-  type        = string
-  description = "Subdomain registered as the sending domain in Resend (must live inside managed_zone); set to \"\" to disable all Resend DNS records"
-  default     = "giftcards.feifan.dev"
-}
-
-variable "resend_return_path_subdomain" {
-  type        = string
-  description = "Host prefix Resend shows for the return-path MX/SPF records (Resend's default is \"send\")"
-  default     = "send"
-}
-
-variable "resend_mx_value" {
-  type        = string
-  description = "MX target copied from the Resend Domains screen (e.g. feedback-smtp.<region>.amazonses.com); leave \"\" until copied so no record is created"
-  default     = ""
-}
-
-variable "resend_mx_priority" {
-  type        = number
-  description = "Priority for the Resend return-path MX record, as shown on the Resend Domains screen"
-  default     = 10
-}
-
-variable "resend_spf_value" {
-  type        = string
-  description = "SPF TXT value copied from the Resend Domains screen; leave \"\" until copied so no record is created"
-  default     = ""
-}
-
-variable "resend_dkim_selector" {
-  type        = string
-  description = "DKIM selector shown by Resend (record name <selector>._domainkey.<sending domain>)"
-  default     = "resend"
-}
-
-variable "resend_dkim_value" {
-  type        = string
-  description = "DKIM public-key TXT value (\"p=...\") copied from the Resend Domains screen; leave \"\" until copied so no record is created"
-  default     = ""
-}
-
-variable "resend_dmarc_rua" {
-  type        = string
-  description = "Optional mailbox (address only, no mailto:) for DMARC aggregate reports; leave \"\" to publish p=none without reporting"
-  default     = ""
+variable "resend_sending_domains" {
+  type = map(object({
+    mx_value              = optional(string, "")
+    mx_priority           = optional(number, 10)
+    spf_value             = optional(string, "")
+    dkim_selector         = optional(string, "resend")
+    dkim_value            = optional(string, "")
+    return_path_subdomain = optional(string, "send")
+    manage_dmarc          = optional(bool, true)
+    dmarc_rua             = optional(string, "")
+  }))
+  description = <<-EOT
+    Sending domains registered in Resend, keyed by domain (the managed zone
+    apex or a subdomain of it). Per-domain values come from the Resend
+    Domains screen: mx_value/mx_priority for the return-path MX,
+    spf_value for the return-path SPF TXT, dkim_value ("p=...") for the
+    <dkim_selector>._domainkey TXT. Records whose value is "" are skipped.
+    manage_dmarc controls whether a monitoring-only DMARC record is
+    published for the domain; dmarc_rua optionally adds an aggregate-report
+    mailbox (address only, no mailto:).
+  EOT
+  default     = {}
 }
 
 # --- Cloudflare Tunnel to the homeserver (Discount Tracker) ---
