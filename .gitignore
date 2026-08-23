@@ -19,8 +19,8 @@ pnpm-debug.log*
 
 # terraform
 infra/terraform.tfvars
-infra/terraform.tfstate
-infra/terraform.tfstate.backup
+infra/*.tfstate
+infra/*.tfstate.*
 infra/.terraform/
 
 # playwright
