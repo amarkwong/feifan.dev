@@ -166,3 +166,25 @@ variable "resend_dmarc_rua" {
   description = "Optional mailbox (address only, no mailto:) for DMARC aggregate reports; leave \"\" to publish p=none without reporting"
   default     = ""
 }
+
+# --- Cloudflare Tunnel to the homeserver (Discount Tracker) ---
+
+variable "homeserver_tunnel_name" {
+  type        = string
+  description = "Name of the Cloudflare Tunnel connecting the homeserver; set to \"\" to disable the tunnel, its config, and its DNS records"
+  default     = "homeserver"
+}
+
+variable "homeserver_tunnel_ingress" {
+  type = list(object({
+    hostname = string
+    service  = string
+  }))
+  description = "Public hostname → origin service routes for the homeserver tunnel; service addresses are resolved by cloudflared inside the homeserver's Docker compose network"
+  default = [
+    {
+      hostname = "giftcards.feifan.dev"
+      service  = "http://tracker:3000"
+    }
+  ]
+}

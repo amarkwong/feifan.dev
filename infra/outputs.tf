@@ -25,6 +25,28 @@ output "dns_records" {
   }
 }
 
+output "homeserver_tunnel_id" {
+  description = "ID of the homeserver Cloudflare Tunnel (null when disabled)"
+  value       = one(cloudflare_zero_trust_tunnel_cloudflared.homeserver[*].id)
+}
+
+output "homeserver_tunnel_token" {
+  description = "Token for cloudflared on the homeserver — goes into TUNNEL_TOKEN in the Discount Tracker deploy .env; read with: terraform output -raw homeserver_tunnel_token"
+  value       = one(cloudflare_zero_trust_tunnel_cloudflared.homeserver[*].tunnel_token)
+  sensitive   = true
+}
+
+output "homeserver_tunnel_dns_records" {
+  description = "Proxied CNAME records pointing tunnel hostnames at the tunnel endpoint"
+  value = {
+    for hostname, record in cloudflare_record.tunnel_cname : hostname => {
+      name   = record.hostname
+      type   = record.type
+      target = record.value
+    }
+  }
+}
+
 output "resend_dns_records" {
   description = "DNS records created for Resend email verification of the sending subdomain"
   value = {

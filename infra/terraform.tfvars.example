@@ -45,3 +45,17 @@ resend_spf_value             = ""     # placeholder, e.g. "v=spf1 include:amazon
 resend_dkim_selector         = "resend"
 resend_dkim_value            = ""     # placeholder: long "p=..." value from Resend
 resend_dmarc_rua             = ""     # optional: mailbox for DMARC aggregate reports
+
+# --- Cloudflare Tunnel (homeserver / Discount Tracker) ---
+# The defaults create a tunnel named "homeserver" routing
+# giftcards.feifan.dev -> http://tracker:3000 with a proxied CNAME, so nothing
+# is usually needed here. Set homeserver_tunnel_name = "" to disable, or add
+# entries to homeserver_tunnel_ingress to expose more homeserver services.
+# The Cloudflare API token must have Account -> Cloudflare Tunnel -> Edit.
+# After apply, the homeserver's TUNNEL_TOKEN comes from:
+#   terraform output -raw homeserver_tunnel_token
+#
+# homeserver_tunnel_name = "homeserver"
+# homeserver_tunnel_ingress = [
+#   { hostname = "giftcards.feifan.dev", service = "http://tracker:3000" },
+# ]
