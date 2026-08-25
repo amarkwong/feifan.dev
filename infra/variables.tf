@@ -161,6 +161,14 @@ variable "homeserver_tunnel_ingress" {
     {
       hostname = "giftcards.feifan.dev"
       service  = "http://tracker:3000"
+    },
+    {
+      hostname = "jellyfin.feifan.dev"
+      service  = "http://10.127.1.77:8096"
+    },
+    {
+      hostname = "seerr.feifan.dev"
+      service  = "http://10.127.1.77:5055"
     }
   ]
 }
