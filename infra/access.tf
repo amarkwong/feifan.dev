@@ -16,7 +16,9 @@ resource "cloudflare_zero_trust_access_identity_provider" "auth0" {
     token_url        = "https://${var.auth0_domain}/oauth/token"
     certs_url        = "https://${var.auth0_domain}/.well-known/jwks.json"
     email_claim_name = "email"
-    claims           = ["sub"]
+    # Authorization uses the standard email claim only. Keep custom claims
+    # empty so Access does not make an unnecessary user/group lookup.
+    claims           = []
     scopes           = ["openid", "email", "profile"]
   }
 }

@@ -25,6 +25,11 @@ resource "auth0_client" "cloudflare_access" {
   grant_types     = ["authorization_code"]
   is_first_party  = true
   oidc_conformant = true
+
+  jwt_configuration {
+    alg = "RS256"
+  }
+
   lifecycle {
     precondition {
       condition     = var.auth0_domain != "" && var.cloudflare_access_team_name != ""
