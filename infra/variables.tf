@@ -113,6 +113,74 @@ variable "primary_domain" {
   default     = ""
 }
 
+# --- Private Lounge authentication and authorization ---
+
+variable "enable_lounge_access" {
+  type        = bool
+  description = "Create the Auth0 client and Cloudflare Access resources for the private Lounge"
+  default     = false
+}
+
+variable "auth0_domain" {
+  type        = string
+  description = "Auth0 tenant domain without https://; this is configuration, not the Terraform provider credential"
+  default     = ""
+}
+
+variable "auth0_connection_name" {
+  type        = string
+  description = "Existing Auth0 database or social connection to enable for invited Lounge members"
+  default     = "Username-Password-Authentication"
+}
+
+variable "cloudflare_access_team_name" {
+  type        = string
+  description = "Cloudflare Zero Trust team name used in <team>.cloudflareaccess.com callback URLs"
+  default     = ""
+}
+
+variable "lounge_hostname" {
+  type        = string
+  description = "Private friends portal hostname"
+  default     = "lounge.feifan.dev"
+}
+
+variable "lounge_pages_project_name" {
+  type        = string
+  description = "Cloudflare Pages project serving the static private Lounge"
+  default     = "feifan-lounge"
+}
+
+variable "owner_email" {
+  type        = string
+  description = "Exact verified Auth0 email allowed to reach the owner-only homeserver homepage"
+  default     = ""
+  sensitive   = true
+}
+
+variable "lounge_allowed_emails" {
+  type        = set(string)
+  description = "Exact Auth0 emails allowed into friend-facing Lounge applications; include the owner"
+  default     = []
+  sensitive   = true
+}
+
+variable "lounge_friend_hostnames" {
+  type        = set(string)
+  description = "Browser-based applications protected by the Lounge email allowlist; Jellyfin is deliberately excluded for native-client compatibility"
+  default = [
+    "lounge.feifan.dev",
+    "giftcards.feifan.dev",
+    "seerr.feifan.dev",
+  ]
+}
+
+variable "home_hostname" {
+  type        = string
+  description = "Owner-only homeserver homepage hostname"
+  default     = "home.feifan.dev"
+}
+
 
 # --- Resend transactional email DNS ---
 # Values below are DNS verification data published publicly once applied, so
@@ -169,6 +237,10 @@ variable "homeserver_tunnel_ingress" {
     {
       hostname = "seerr.feifan.dev"
       service  = "http://10.127.1.77:5055"
+    },
+    {
+      hostname = "home.feifan.dev"
+      service  = "http://homeserver:8082"
     }
   ]
 }

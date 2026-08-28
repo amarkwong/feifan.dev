@@ -10,11 +10,24 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.6"
     }
+    auth0 = {
+      source  = "auth0/auth0"
+      version = "~> 1.55"
+    }
   }
 }
 
 provider "cloudflare" {
   api_token = var.cloudflare_api_token
+}
+
+# Credentials are intentionally read from AUTH0_DOMAIN, AUTH0_CLIENT_ID, and
+# AUTH0_CLIENT_SECRET. Dummy values keep ordinary plans working while the
+# feature is disabled; no Auth0 resources exist in that mode.
+provider "auth0" {
+  domain        = var.enable_lounge_access ? var.auth0_domain : "disabled.invalid"
+  client_id     = var.enable_lounge_access ? null : "disabled"
+  client_secret = var.enable_lounge_access ? null : "disabled"
 }
 
 locals {

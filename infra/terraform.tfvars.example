@@ -67,4 +67,19 @@ resend_sending_domains = {
 # homeserver_tunnel_name = "homeserver"
 # homeserver_tunnel_ingress = [
 #   { hostname = "giftcards.feifan.dev", service = "http://tracker:3000" },
+#   { hostname = "jellyfin.feifan.dev", service = "http://10.127.1.77:8096" },
+#   { hostname = "seerr.feifan.dev", service = "http://10.127.1.77:5055" },
+#   { hostname = "home.feifan.dev", service = "http://homeserver:8082" },
 # ]
+
+# --- Private Lounge (Auth0 + Cloudflare Access) ---
+# Leave disabled until the Auth0 Terraform M2M credentials are exported as
+# AUTH0_DOMAIN, AUTH0_CLIENT_ID, and AUTH0_CLIENT_SECRET. The Cloudflare token
+# also needs Access Apps/Policies and Identity Providers/Groups edit access.
+#
+# enable_lounge_access        = true
+# auth0_domain                = "your-tenant.au.auth0.com"
+# auth0_connection_name       = "Username-Password-Authentication"
+# cloudflare_access_team_name = "your-team-name"
+# owner_email                 = "you@example.com"
+# lounge_allowed_emails       = ["you@example.com", "friend@example.com"]

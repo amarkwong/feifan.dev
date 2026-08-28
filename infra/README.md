@@ -135,3 +135,33 @@ dig +short TXT _dmarc.giftcards.feifan.dev
 
 Once verified, the Discount Tracker runtime (configured in its own repo with
 the Resend API key) can send from `notifications@giftcards.feifan.dev`.
+
+## Private Lounge access
+
+Terraform can create the Auth0 client and Cloudflare Access boundary for
+`lounge.feifan.dev`, Discount Tracker, Seerr, and the owner-only homeserver
+homepage. Jellyfin deliberately keeps its native authentication so television,
+mobile, and desktop clients continue to work.
+
+The feature is off by default. Before setting `enable_lounge_access = true`:
+
+1. Create an Auth0 Machine-to-Machine application for Terraform and authorize
+   it for client, client-credential (`read:client_credentials`), and connection
+   management.
+2. Export `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`, and `AUTH0_CLIENT_SECRET` in the
+   shell running Terraform. Never store the M2M secret in tfvars.
+3. Give the Cloudflare API token Access Apps/Policies and Access Identity
+   Providers/Groups edit permissions.
+4. Configure `auth0_domain`, `auth0_connection_name`,
+   `cloudflare_access_team_name`, `owner_email`, and the exact invited emails in
+   `lounge_allowed_emails` in the ignored tfvars file. Include the owner email.
+
+The allowlist does not contact invitees or require their Auth0 accounts to
+exist in advance. On first use they can sign up through the configured Auth0
+database connection, after which Cloudflare admits only an exact email match.
+Keep Discount Tracker's application-level invitation check during migration;
+it can be retired after the Cloudflare boundary has been verified.
+
+The generated Auth0 OIDC client secret is necessarily stored in Terraform
+state because Cloudflare needs it. Keep the local state private and migrate it
+to encrypted remote state before sharing Terraform administration.
