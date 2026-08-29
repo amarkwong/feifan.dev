@@ -66,10 +66,8 @@ resend_sending_domains = {
 #
 # homeserver_tunnel_name = "homeserver"
 # homeserver_tunnel_ingress = [
-#   { hostname = "giftcards.feifan.dev", service = "http://tracker:3000" },
-#   { hostname = "jellyfin.feifan.dev", service = "http://10.127.1.77:8096" },
-#   { hostname = "seerr.feifan.dev", service = "http://10.127.1.77:5055" },
-#   { hostname = "home.feifan.dev", service = "http://homeserver:8082" },
+#   { hostname = "private-app.example.com", service = "http://app:3000" },
+#   { hostname = "media.example.com", service = "http://192.0.2.10:8000" },
 # ]
 
 # --- Private Lounge (Auth0 + Cloudflare Access) ---

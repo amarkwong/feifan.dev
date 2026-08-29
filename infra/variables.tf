@@ -225,22 +225,5 @@ variable "homeserver_tunnel_ingress" {
     service  = string
   }))
   description = "Public hostname → origin service routes for the homeserver tunnel; service addresses are resolved by cloudflared inside the homeserver's Docker compose network"
-  default = [
-    {
-      hostname = "giftcards.feifan.dev"
-      service  = "http://tracker:3000"
-    },
-    {
-      hostname = "jellyfin.feifan.dev"
-      service  = "http://10.127.1.77:8096"
-    },
-    {
-      hostname = "seerr.feifan.dev"
-      service  = "http://10.127.1.77:5055"
-    },
-    {
-      hostname = "home.feifan.dev"
-      service  = "http://homeserver:8082"
-    }
-  ]
+  default     = []
 }
