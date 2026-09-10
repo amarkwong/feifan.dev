@@ -33,3 +33,6 @@ test-results/
 
 # jetbrains setting folder
 .idea/
+
+# Local live deployment inputs (including invitation emails)
+infra/*.auto.tfvars.json

@@ -50,6 +50,11 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "homeserver" {
       }
     }
 
+    ingress_rule {
+      hostname = "ppt-origin.feifan.dev"
+      service  = "http://powerpoint:8000"
+    }
+
     # Required catch-all: hostnames not matched above return 404 at the edge.
     ingress_rule {
       service = "http_status:404"

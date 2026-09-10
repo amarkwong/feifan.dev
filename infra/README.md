@@ -165,3 +165,21 @@ it can be retired after the Cloudflare boundary has been verified.
 The generated Auth0 OIDC client secret is necessarily stored in Terraform
 state because Cloudflare needs it. Keep the local state private and migrate it
 to encrypted remote state before sharing Terraform administration.
+
+## Slide Studio at /ppt
+
+`powerpoint.tf` and `powerpoint-worker.js` route `lounge.feifan.dev/ppt/` to
+`ppt-origin.feifan.dev` through the existing homeserver tunnel. The Lounge
+Access policy remains in force. The Python origin verifies signed Access JWTs
+against the Lounge audience, so the origin hostname cannot bypass authentication.
+The existing Pages homepage remains unchanged apart from a Slide Studio link.
+
+The PowerPointDrawer repository owns the container and NixOS module. Its
+`DEPLOY.md` describes the shared LLM credential handling and installation.
+
+Existing live tunnel and Access settings were recovered from state into local,
+gitignored `live.auto.tfvars.json`; preserve that file and supply Auth0 management
+credentials before a full plan. Never disable Access simply to run a plan. The
+initial /ppt deployment used a reviewed targeted plan for its three new resources
+and the existing tunnel configuration because Auth0 management credentials were
+not available in this shell. All prior tunnel routes were preserved.
