@@ -170,9 +170,28 @@ variable "lounge_friend_hostnames" {
   description = "Browser-based applications protected by the Lounge email allowlist; Jellyfin is deliberately excluded for native-client compatibility"
   default = [
     "lounge.feifan.dev",
+    "discounts.feifan.dev",
     "giftcards.feifan.dev",
     "seerr.feifan.dev",
   ]
+}
+
+variable "discount_tracker_hostname" {
+  type        = string
+  description = "Canonical public hostname for Discount Tracker"
+  default     = "discounts.feifan.dev"
+}
+
+variable "discount_tracker_legacy_hostname" {
+  type        = string
+  description = "Previous Discount Tracker hostname retained as a permanent redirect"
+  default     = "giftcards.feifan.dev"
+}
+
+variable "discount_tracker_service" {
+  type        = string
+  description = "Discount Tracker origin as resolved by cloudflared on the homeserver network"
+  default     = "http://tracker:3000"
 }
 
 variable "home_hostname" {

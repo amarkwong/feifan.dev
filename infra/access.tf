@@ -18,8 +18,8 @@ resource "cloudflare_zero_trust_access_identity_provider" "auth0" {
     email_claim_name = "email"
     # Authorization uses the standard email claim only. Keep custom claims
     # empty so Access does not make an unnecessary user/group lookup.
-    claims           = []
-    scopes           = ["openid", "email", "profile"]
+    claims = []
+    scopes = ["openid", "email", "profile"]
   }
 }
 
@@ -72,7 +72,10 @@ resource "cloudflare_zero_trust_access_policy" "owner" {
 }
 
 resource "cloudflare_zero_trust_access_application" "friends" {
-  for_each = var.enable_lounge_access ? var.lounge_friend_hostnames : toset([])
+  for_each = var.enable_lounge_access ? setunion(var.lounge_friend_hostnames, toset([
+    var.discount_tracker_hostname,
+    var.discount_tracker_legacy_hostname,
+  ])) : toset([])
 
   account_id                = var.cloudflare_account_id
   name                      = "Lounge - ${each.value}"

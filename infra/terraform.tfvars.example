@@ -57,8 +57,9 @@ resend_sending_domains = {
 
 # --- Cloudflare Tunnel (homeserver / Discount Tracker) ---
 # The defaults create a tunnel named "homeserver" routing
-# giftcards.feifan.dev -> http://tracker:3000 with a proxied CNAME, so nothing
-# is usually needed here. Set homeserver_tunnel_name = "" to disable, or add
+# discounts.feifan.dev -> http://tracker:3000 with a proxied CNAME, while
+# giftcards.feifan.dev permanently redirects to it. Nothing is usually needed
+# here. Set homeserver_tunnel_name = "" to disable, or add
 # entries to homeserver_tunnel_ingress to expose more homeserver services.
 # The Cloudflare API token must have Account -> Cloudflare Tunnel -> Edit.
 # After apply, the homeserver's TUNNEL_TOKEN comes from:

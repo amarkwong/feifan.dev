@@ -3,4 +3,4 @@
   Referrer-Policy: strict-origin-when-cross-origin
   X-Content-Type-Options: nosniff
   Permissions-Policy: camera=(), microphone=(), geolocation=()
-  Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; navigate-to 'self' https://giftcards.feifan.dev https://seerr.feifan.dev https://jellyfin.feifan.dev https://home.feifan.dev https://feifan.dev
+  Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; navigate-to 'self' https://discounts.feifan.dev https://seerr.feifan.dev https://jellyfin.feifan.dev https://home.feifan.dev https://feifan.dev

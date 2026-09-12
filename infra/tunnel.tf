@@ -14,12 +14,32 @@
 locals {
   tunnel_enabled = var.homeserver_tunnel_name != ""
 
+  # Discount Tracker's canonical route is part of the committed infrastructure
+  # contract. Filter either migration hostname out of the free-form list so an
+  # older ignored tfvars file cannot create duplicate tunnel rules.
+  homeserver_tunnel_ingress = concat(
+    [{
+      hostname = var.discount_tracker_hostname
+      service  = var.discount_tracker_service
+    }],
+    [
+      for rule in var.homeserver_tunnel_ingress : rule
+      if !contains([
+        var.discount_tracker_hostname,
+        var.discount_tracker_legacy_hostname,
+      ], rule.hostname)
+    ]
+  )
+
   # Ingress hostnames inside the managed zone each get a proxied CNAME to the
   # tunnel endpoint. Hostnames outside the zone are routed by the tunnel but
   # must have DNS managed elsewhere.
   tunnel_dns_hostnames = local.tunnel_enabled && local.managed_zone_id != null ? {
-    for rule in var.homeserver_tunnel_ingress : rule.hostname => rule.hostname
-    if rule.hostname == var.managed_zone || endswith(rule.hostname, ".${var.managed_zone}")
+    for hostname in setunion(
+      toset([for rule in local.homeserver_tunnel_ingress : rule.hostname]),
+      toset([var.discount_tracker_legacy_hostname]),
+    ) : hostname => hostname
+    if hostname == var.managed_zone || endswith(hostname, ".${var.managed_zone}")
   } : {}
 }
 
@@ -43,7 +63,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "homeserver" {
 
   config {
     dynamic "ingress_rule" {
-      for_each = var.homeserver_tunnel_ingress
+      for_each = local.homeserver_tunnel_ingress
       content {
         hostname = ingress_rule.value.hostname
         service  = ingress_rule.value.service
