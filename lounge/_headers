@@ -4,3 +4,10 @@
   X-Content-Type-Options: nosniff
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; navigate-to 'self' https://discounts.feifan.dev https://seerr.feifan.dev https://jellyfin.feifan.dev https://home.feifan.dev https://feifan.dev
+
+/
+  Cache-Control: no-cache, must-revalidate
+/lounge.js
+  Cache-Control: no-cache, must-revalidate
+/lounge.css
+  Cache-Control: no-cache, must-revalidate

@@ -33,7 +33,7 @@ const stops = {
     href: '/ppt/', camera: [5.6, 3.2, 5.5], target: [3.55, 1.35, 0.8],
   },
 };
-stops.home = { label: 'Mac Pro', number: '05', type: 'Home Server · Owner only', title: 'Home Server', copy: 'Open the private server dashboard. Access is restricted to Feifan.', href: 'https://home.feifan.dev', camera: [7.5, 2.8, 1.8], target: [6.4, 1.1, -2.4] };
+stops.home = { label: 'Mac Pro', number: '05', type: 'Home Server · Owner only', title: 'Home Server', copy: 'Open the private server dashboard. Access is restricted to Feifan.', href: 'https://home.feifan.dev', camera: [8.5, 2.8, 3.8], target: [5.8, 1.1, -.45] };
 const tourOrder = ['overview', 'seerr', 'jellyfin', 'discounts', 'ppt', 'home'];
 let currentStop = 'overview';
 let renderer;
@@ -60,9 +60,9 @@ if (renderer) {
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.15;
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
 
-  const camera = new THREE.PerspectiveCamera(43, 1, 0.1, 100);
+  const camera = new THREE.PerspectiveCamera(43, 1, 0.3, 60);
   camera.position.fromArray(stops.overview.camera);
   const cameraTarget = new THREE.Vector3().fromArray(stops.overview.target);
   const desiredPosition = camera.position.clone();
@@ -73,7 +73,7 @@ if (renderer) {
   const standard = (color, options = {}) => new THREE.MeshStandardMaterial({ color, roughness: .72, metalness: .05, ...options });
   const box = (size, position, material, parent = scene) => {
     const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
-    mesh.position.set(...position); mesh.castShadow = true; mesh.receiveShadow = true; parent.add(mesh); return mesh;
+    mesh.position.set(...position); mesh.castShadow = true; mesh.receiveShadow = false; parent.add(mesh); return mesh;
   };
   const markInteractive = (group, stop) => group.traverse((child) => { if (child.isMesh) child.userData.stop = stop; });
 
@@ -84,8 +84,8 @@ if (renderer) {
   box([20, .16, .28], [0, .1, -4.05], standard(0xb5966e));
 
   const rug = new THREE.Mesh(new THREE.PlaneGeometry(7.8, 4.6), standard(0x9b513f, { roughness: 1 }));
-  rug.rotation.x = -Math.PI / 2; rug.position.set(.3, .015, .65); rug.receiveShadow = true; scene.add(rug);
-  for (let i = -4; i <= 4; i += 1) box([.025, .012, 4.2], [i * .82 + .3, .03, .65], standard(0xd8a26f), scene);
+  rug.rotation.x = -Math.PI / 2; rug.position.set(.3, .04, .65); rug.receiveShadow = true; scene.add(rug);
+  for (let i = -4; i <= 4; i += 1) box([.025, .012, 4.2], [i * .82 + .3, .06, .65], standard(0xd8a26f), scene);
 
   const windowGroup = new THREE.Group(); windowGroup.position.set(-1.8, 3.35, -4.05); scene.add(windowGroup);
   box([3.2, 2.45, .14], [0, 0, 0], standard(0x172b2b), windowGroup);
@@ -148,24 +148,43 @@ if (renderer) {
   const projector = new THREE.Group(); projector.position.set(3.45, 0, .8); scene.add(projector);
   box([2.8, .16, 2.1], [0, .9, 0], standard(0x885d3c), projector);
   for (const x of [-1.15, 1.15]) for (const z of [-.8, .8]) box([.12, .9, .12], [x, .45, z], standard(0x553c2f), projector);
-  box([1.8, .48, 1.35], [0, 1.22, 0], standard(0xd0c3a5), projector);
-  box([1.8, .12, 1.35], [0, 1, 0], standard(0x292923), projector);
-  const tray = new THREE.Group(); tray.position.set(-.1, 1.56, -.1); projector.add(tray);
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(.62, .12, 12, 64), standard(0x292923)); ring.rotation.x = Math.PI / 2; tray.add(ring);
-  const hub = new THREE.Mesh(new THREE.CylinderGeometry(.23, .23, .15, 32), standard(0x393a32)); tray.add(hub);
-  for (let i = 0; i < 60; i++) {
-    const angle = i * Math.PI / 30;
-    const slot = box([.26, .16, .018], [Math.cos(angle) * .48, .02, Math.sin(angle) * .48], standard(i % 5 ? 0x52534a : 0xe5ddc9), tray);
+  const housing = standard(0x56646d, { roughness: .4, metalness: .25 });
+  box([2.05, .52, 1.85], [0, 1.36, 0], housing, projector);
+  box([2.07, .08, 1.87], [0, 1.06, 0], standard(0x303b42), projector);
+  const tray = new THREE.Group(); tray.position.set(0, 1.7, -.06); projector.add(tray);
+  const trayBlack = standard(0x161b1d);
+  function annulus(outer, inner, height, material, parent) {
+    const shape = new THREE.Shape(); shape.absarc(0, 0, outer, 0, Math.PI * 2, false);
+    const hole = new THREE.Path(); hole.absarc(0, 0, inner, 0, Math.PI * 2, true); shape.holes.push(hole);
+    const geometry = new THREE.ExtrudeGeometry(shape, { depth: height, bevelEnabled: false, curveSegments: 80 });
+    const mesh = new THREE.Mesh(geometry, material); mesh.rotation.x = -Math.PI / 2; parent.add(mesh); return mesh;
+  }
+  annulus(.91, .38, .13, trayBlack, tray);
+  const clear = standard(0xdce9ed, { transparent: true, opacity: .24, metalness: .15, roughness: .2, depthWrite: false });
+  annulus(.91, .88, .48, clear, tray);
+  annulus(.42, .39, .48, clear, tray);
+  for (let i = 0; i < 80; i++) {
+    const angle = i * Math.PI / 40;
+    const slot = box([.45, .29, .009], [Math.cos(angle) * .65, .29, Math.sin(angle) * .65], standard(0xc5d1d3, { roughness: .45 }), tray);
     slot.rotation.y = -angle;
   }
-  const lens = new THREE.Mesh(new THREE.CylinderGeometry(.22, .25, .45, 32), standard(0x252a28, { metalness: .5 })); lens.rotation.x = Math.PI / 2; lens.position.set(.48, 1.23, .82); projector.add(lens);
-  const glass = new THREE.Mesh(new THREE.CircleGeometry(.18, 32), standard(0xe9d69c, { emissive: 0xffcb76, emissiveIntensity: .8 })); glass.position.set(.48, 1.23, 1.05); projector.add(glass);
-  box([.44, .12, .025], [-.48, 1.23, .69], standard(0xc99433), projector);
-  for (let i = 0; i < 8; i++) box([.015, .19, .025], [-.75 + i * .055, 1.2, .69], standard(0x393a32), projector);
+  // Separate clear cover from the slots; fixed order avoids transparency sorting flicker.
+  const lid = annulus(.92, .39, .018, clear, tray); lid.position.y = .48;
+  tray.traverse((object) => { if (object.isMesh) { object.castShadow = false; if (object.material.transparent) object.renderOrder = 2; } });
+  box([.73, .57, .06], [-.58, 1.28, .95], standard(0x151a1d), projector);
+  const lens = new THREE.Mesh(new THREE.CylinderGeometry(.25, .27, .16, 40), trayBlack); lens.rotation.x = Math.PI / 2; lens.position.set(-.58, 1.27, 1.02); projector.add(lens);
+  const glass = new THREE.Mesh(new THREE.CircleGeometry(.21, 40), standard(0x10242a, { metalness: .85, roughness: .08 })); glass.position.set(-.58, 1.27, 1.11); projector.add(glass);
+  box([1.05, .12, .1], [.43, 1.18, 1.0], trayBlack, projector);
+  for (const x of [-.05, .9]) box([.08, .17, .08], [x, 1.25, 1.0], trayBlack, projector);
+  const labelCanvas = document.createElement('canvas'); labelCanvas.width = 768; labelCanvas.height = 90;
+  const labelContext = labelCanvas.getContext('2d'); labelContext.fillStyle = '#56646d'; labelContext.fillRect(0,0,768,90); labelContext.fillStyle = '#f5f5ef'; labelContext.font = '32px system-ui'; labelContext.fillText('Kodak CAROUSEL S-AV 2010', 12, 55);
+  const labelTexture = new THREE.CanvasTexture(labelCanvas); labelTexture.colorSpace = THREE.SRGBColorSpace;
+  box([1.13, .15, .015], [.35, 1.49, .946], standard(0xffffff, { map: labelTexture }), projector);
+  const knob = new THREE.Mesh(new THREE.CylinderGeometry(.12, .12, .14, 24), trayBlack); knob.rotation.z = Math.PI / 2; knob.position.set(-1.08,1.24,.62); projector.add(knob);
   markInteractive(projector, 'ppt');
 
   // Aluminum tower with handles, feet, and perforated front grille.
-  const mac = new THREE.Group(); mac.position.set(6.4, 0, -2.4); scene.add(mac);
+  const mac = new THREE.Group(); mac.position.set(5.8, 0, -.45); scene.add(mac);
   const aluminum = standard(0xbfc6c7, { metalness: .65, roughness: .35 });
   box([.95, 1.9, 1.3], [0, 1.13, 0], aluminum, mac);
   for (const x of [-.37, .37]) {
@@ -183,12 +202,17 @@ if (renderer) {
   box([.04, .025, .025], [.3, 1.97, .68], standard(0xbfe5c9, { emissive: 0x90cba7, emissiveIntensity: .5 }), mac);
   markInteractive(mac, 'home');
 
-  const lamp = new THREE.Group(); lamp.position.set(6, 0, 2.6); scene.add(lamp);
+  const lamp = new THREE.Group(); lamp.position.set(-3.5, 0, 2.6); scene.add(lamp);
   const lampPole = new THREE.Mesh(new THREE.CylinderGeometry(.035, .05, 3.4, 12), standard(0xc8ad72, { metalness: .55 })); lampPole.position.y = 1.7; lamp.add(lampPole);
   const lampShade = new THREE.Mesh(new THREE.CylinderGeometry(.42, .72, .75, 24, 1, true), standard(0xe5c98a, { side: THREE.DoubleSide, emissive: 0xb98242, emissiveIntensity: .25 })); lampShade.position.y = 3.35; lamp.add(lampShade);
-  const lampLight = new THREE.PointLight(0xffd39a, 28, 9, 1.8); lampLight.position.set(6, 3.15, 2.4); lampLight.castShadow = true; scene.add(lampLight);
+  const lampLight = new THREE.PointLight(0xffd39a, 28, 9, 1.8); lampLight.position.set(-3.5, 3.15, 2.4); lampLight.castShadow = false; scene.add(lampLight);
   scene.add(new THREE.HemisphereLight(0xbad9d0, 0x5d4230, 2.4));
-  const keyLight = new THREE.DirectionalLight(0xffead0, 3.1); keyLight.position.set(2, 7, 5); keyLight.castShadow = true; keyLight.shadow.mapSize.set(1024, 1024); scene.add(keyLight);
+  const keyLight = new THREE.DirectionalLight(0xffead0, 3.1); keyLight.position.set(2, 7, 5); keyLight.castShadow = true; keyLight.shadow.mapSize.set(2048, 2048);
+  keyLight.shadow.camera.left = -10; keyLight.shadow.camera.right = 10;
+  keyLight.shadow.camera.top = 8; keyLight.shadow.camera.bottom = -8;
+  keyLight.shadow.camera.near = .5; keyLight.shadow.camera.far = 30;
+  keyLight.shadow.bias = -.0004; keyLight.shadow.normalBias = .035;
+  keyLight.shadow.camera.updateProjectionMatrix(); scene.add(keyLight);
 
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
