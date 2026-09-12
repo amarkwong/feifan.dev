@@ -13,27 +13,27 @@ const stops = {
     camera: [8.8, 5.6, 11.5], target: [0, 1.7, -0.8],
   },
   seerr: {
-    label: 'DVD cabinet', number: '01', type: 'Browse · Request', title: 'Seerr',
+    label: 'Seerr', number: '01', type: 'Browse · Request', title: 'Seerr',
     copy: 'Browse the shelves, then request a film or series for the shared library.',
     href: 'https://seerr.feifan.dev', camera: [-6.2, 3.1, 3.4], target: [-4.25, 1.9, -2.5],
   },
   jellyfin: {
-    label: 'Television', number: '02', type: 'Watch · Continue', title: 'Jellyfin',
+    label: 'Jellyfin', number: '02', type: 'Watch · Continue', title: 'Jellyfin',
     copy: 'Settle into the sofa and open the shared film and television library.',
     href: 'https://jellyfin.feifan.dev', camera: [0.4, 3.2, 4.8], target: [0, 2.05, -3.72],
   },
   discounts: {
-    label: 'Pin board', number: '03', type: 'Save · Compare', title: 'Discount Tracker',
+    label: 'Discount Tracker', number: '03', type: 'Save · Compare', title: 'Discount Tracker',
     copy: 'See the gift-card offers pinned up today and find the ones worth using.',
     href: 'https://discounts.feifan.dev', camera: [6.35, 3.15, 2.4], target: [4.45, 2.25, -3.62],
   },
   ppt: {
-    label: 'Carousel projector', number: '04', type: 'Create · Present', title: 'PowerPoint Studio',
+    label: 'PowerPoint Studio', number: '04', type: 'Create · Present', title: 'PowerPoint Studio',
     copy: 'Turn a topic into an editable deck with curated layouts and AI-assisted copy.',
     href: '/ppt/', camera: [5.6, 3.2, 5.5], target: [3.55, 1.35, 0.8],
   },
 };
-stops.home = { label: 'Mac Pro', number: '05', type: 'Home Server · Owner only', title: 'Home Server', copy: 'Open the private server dashboard. Access is restricted to Feifan.', href: 'https://home.feifan.dev', camera: [8.5, 2.8, 3.8], target: [5.8, 1.1, -.45] };
+stops.home = { label: 'Home Server', number: '05', type: 'Home Server · Owner only', title: 'Home Server', copy: 'Open the private server dashboard. Access is restricted to Feifan.', href: 'https://home.feifan.dev', camera: [8.5, 2.8, 3.8], target: [5.8, 1.1, -.45] };
 const tourOrder = ['overview', 'seerr', 'jellyfin', 'discounts', 'ppt', 'home'];
 let currentStop = 'overview';
 let renderer;
@@ -139,8 +139,9 @@ if (renderer) {
     [-.58, -.5, -.04, 0xf1eee2], [.45, -.48, .04, 0xd9b1b5], [1.0, -.55, -.07, 0xc5d1aa],
   ];
   cardData.forEach(([x, y, rotation, color], index) => {
-    const giftCard = box([.72, .46, .035], [x, y, .225], standard(color), pinboard); giftCard.rotation.z = rotation;
-    const pin = new THREE.Mesh(new THREE.SphereGeometry(.045, 12, 8), standard(index % 2 ? 0xe8bd55 : 0x8d3245)); pin.position.set(x, y + .18, .27); pinboard.add(pin);
+    const cardDepth = .25 + index * .055;
+    const giftCard = box([.72, .46, .035], [x, y, cardDepth], standard(color), pinboard); giftCard.rotation.z = rotation;
+    const pin = new THREE.Mesh(new THREE.SphereGeometry(.045, 12, 8), standard(index % 2 ? 0xe8bd55 : 0x8d3245)); pin.position.set(x, y + .18, cardDepth + .045); pinboard.add(pin);
   });
   markInteractive(pinboard, 'discounts');
 
@@ -159,27 +160,24 @@ if (renderer) {
     const geometry = new THREE.ExtrudeGeometry(shape, { depth: height, bevelEnabled: false, curveSegments: 80 });
     const mesh = new THREE.Mesh(geometry, material); mesh.rotation.x = -Math.PI / 2; parent.add(mesh); return mesh;
   }
-  annulus(.91, .38, .13, trayBlack, tray);
-  const clear = standard(0xdce9ed, { transparent: true, opacity: .24, metalness: .15, roughness: .2, depthWrite: false });
-  annulus(.91, .88, .34, clear, tray).position.y = .14;
-  annulus(.42, .39, .34, clear, tray).position.y = .14;
+  // Solid tray seated directly on the housing; no transparent or coincident faces.
+  tray.position.y = 1.625;
+  const trayBase = new THREE.Mesh(new THREE.CylinderGeometry(.92, .92, .13, 96), trayBlack);
+  trayBase.position.y = .065; tray.add(trayBase);
+  const trayShell = standard(0xaebabc, { roughness: .55 });
+  annulus(.92, .89, .32, trayShell, tray).position.y = .135;
+  annulus(.42, .39, .32, trayShell, tray).position.y = .135;
   for (let i = 0; i < 80; i++) {
     const angle = i * Math.PI / 40;
-    const slot = box([.45, .29, .009], [Math.cos(angle) * .65, .29, Math.sin(angle) * .65], standard(0xc5d1d3, { roughness: .45 }), tray);
+    const slot = box([.45, .29, .009], [Math.cos(angle) * .65, .29, Math.sin(angle) * .65], standard(0xdce2dd), tray);
     slot.rotation.y = -angle;
   }
-  // Separate clear cover from the slots; fixed order avoids transparency sorting flicker.
-  const lid = annulus(.92, .39, .018, clear, tray); lid.position.y = .48;
-  tray.traverse((object) => { if (object.isMesh) { object.castShadow = false; if (object.material.transparent) object.renderOrder = 2; } });
+  tray.traverse((object) => { if (object.isMesh) object.castShadow = false; });
   box([.73, .57, .06], [-.58, 1.28, .95], standard(0x151a1d), projector);
   const lens = new THREE.Mesh(new THREE.CylinderGeometry(.25, .27, .16, 40), trayBlack); lens.rotation.x = Math.PI / 2; lens.position.set(-.58, 1.27, 1.02); projector.add(lens);
   const glass = new THREE.Mesh(new THREE.CircleGeometry(.21, 40), standard(0x10242a, { metalness: .85, roughness: .08 })); glass.position.set(-.58, 1.27, 1.11); projector.add(glass);
   box([1.05, .12, .1], [.43, 1.18, 1.0], trayBlack, projector);
   for (const x of [-.05, .9]) box([.08, .17, .08], [x, 1.25, 1.0], trayBlack, projector);
-  const labelCanvas = document.createElement('canvas'); labelCanvas.width = 768; labelCanvas.height = 90;
-  const labelContext = labelCanvas.getContext('2d'); labelContext.fillStyle = '#56646d'; labelContext.fillRect(0,0,768,90); labelContext.fillStyle = '#f5f5ef'; labelContext.font = '32px system-ui'; labelContext.fillText('Kodak CAROUSEL S-AV 2010', 12, 55);
-  const labelTexture = new THREE.CanvasTexture(labelCanvas); labelTexture.colorSpace = THREE.SRGBColorSpace;
-  box([1.13, .15, .015], [.35, 1.49, .946], standard(0xffffff, { map: labelTexture }), projector);
   const knob = new THREE.Mesh(new THREE.CylinderGeometry(.12, .12, .14, 24), trayBlack); knob.rotation.z = Math.PI / 2; knob.position.set(-1.08,1.24,.62); projector.add(knob);
   markInteractive(projector, 'ppt');
 
