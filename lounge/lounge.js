@@ -102,14 +102,18 @@ if (renderer) {
   box([.7, .7, .22], [-1.45, 1.65, .78], standard(0xc9785c), sofa); box([.75, .6, .22], [1.55, 1.58, .78], standard(0xd7b66f), sofa);
 
   const cabinet = new THREE.Group(); cabinet.position.set(-4.7, 0, -2.65); scene.add(cabinet);
-  box([2.45, 4.2, .82], [0, 2.1, 0], standard(0x704b32), cabinet);
-  box([2.15, 3.82, .86], [0, 2.12, .08], standard(0x193a32), cabinet);
+  // Separate structural panels leave real space for the cases.
+  const cabinetWood = standard(0x704b32);
+  box([2.45, 4.2, .12], [0, 2.1, -.46], standard(0x193a32), cabinet);
+  for (const x of [-1.155, 1.155]) box([.14, 4.2, .94], [x, 2.1, .08], cabinetWood, cabinet);
+  box([2.16, .14, .94], [0, 4.13, .08], cabinetWood, cabinet);
+  box([2.16, .14, .94], [0, .07, .08], cabinetWood, cabinet);
   const dvdColors = [0xd8795b, 0xe1bd78, 0x7b9b8b, 0xc9d5bd, 0x9c6b75, 0xd8a26f];
   for (let shelf = 0; shelf < 5; shelf += 1) {
-    box([2.18, .12, 1], [0, .55 + shelf * .77, .1], standard(0x8a6040), cabinet);
+    box([2.16, .12, .94], [0, .4 + shelf * .73, .08], standard(0x8a6040), cabinet);
     for (let item = 0; item < 8; item += 1) {
       const height = .42 + ((item + shelf) % 3) * .08;
-      box([.17, height, .72], [-.86 + item * .245, .83 + shelf * .77, .2], standard(dvdColors[(item + shelf) % dvdColors.length]), cabinet);
+      box([.17, height, .66], [-.86 + item * .245, .465 + shelf * .73 + height / 2, .08], standard(dvdColors[(item + shelf) % dvdColors.length]), cabinet);
     }
   }
   markInteractive(cabinet, 'seerr');
