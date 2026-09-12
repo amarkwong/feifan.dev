@@ -39,6 +39,21 @@ If either variable is missing the UI gracefully falls back to the hard-coded sam
 | `npm run build` | Type-check and build the static site      |
 | `npm run preview` | Serve the production build locally      |
 
+## Lounge room
+
+The invitation-only Lounge is a separate static Cloudflare Pages project rooted
+at `lounge/`. Its Three.js room is progressively enhanced: the semantic service
+directory remains usable when WebGL or motion is unavailable.
+
+Preview it locally with:
+
+```bash
+python3 -m http.server 4323 --directory lounge
+```
+
+Three.js is pinned in `package.json`; its browser modules are vendored under
+`lounge/vendor/` so the Lounge Content Security Policy does not depend on a CDN.
+
 ## Notion data shape
 
 The runtime endpoint at `functions/api/notion/highlights.js` expects the database to expose these properties:

@@ -12,9 +12,10 @@
     "test:ui": "playwright test --ui"
   },
   "dependencies": {
-    "@astrojs/check": "^0.7.0",
-    "astro": "^4.10.2",
+    "@astrojs/check": "^0.9.10",
+    "astro": "^7.3.2",
     "katex": "^0.16.25",
+    "three": "^0.186.0",
     "typescript": "^5.4.5"
   },
   "devDependencies": {

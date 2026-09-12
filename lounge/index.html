@@ -4,264 +4,61 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow, noarchive" />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="theme-color" content="#18372f" />
     <title>Feifan’s Lounge</title>
-    <meta name="description" content="A collection of services for Feifan's invited friends." />
-    <style>
-      :root {
-        color-scheme: light;
-        --bg-base: #ffffff;
-        --text-primary: #0b0b0b;
-        --text-muted: rgba(11, 11, 11, 0.65);
-        --panel-bg: #ffffff;
-        --panel-border: rgba(11, 11, 11, 0.08);
-        --panel-shadow: 0 12px 32px rgba(11, 11, 11, 0.06);
-      }
-
-      * { box-sizing: border-box; }
-      html { scroll-behavior: smooth; }
-
-      body {
-        margin: 0;
-        min-height: 100vh;
-        color: var(--text-primary);
-        background: var(--bg-base);
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      }
-
-      nav {
-        position: fixed;
-        z-index: 10;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background: rgba(255, 255, 255, 0.95);
-        border-bottom: 1px solid var(--panel-border);
-        backdrop-filter: blur(8px);
-      }
-
-      .nav-inner {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: min(960px, 100%);
-        min-height: 88px;
-        margin: 0 auto;
-        padding: 0.75rem 1rem;
-      }
-
-      .brand {
-        color: var(--text-primary);
-        font-size: 1rem;
-        font-weight: 700;
-        letter-spacing: -0.025em;
-        text-decoration: none;
-      }
-
-      .back-link {
-        color: var(--text-muted);
-        font-size: 0.92rem;
-        font-weight: 500;
-        letter-spacing: 0.04em;
-        text-decoration: none;
-      }
-
-      .brand:hover, .brand:focus-visible, .back-link:hover, .back-link:focus-visible { color: var(--text-primary); }
-
-      main {
-        width: min(960px, 100%);
-        margin: 0 auto;
-        padding: 7.25rem 2rem 4rem;
-      }
-
-      .hero {
-        display: flex;
-        flex-direction: column;
-        gap: 1.25rem;
-        padding: 3rem;
-        background: var(--panel-bg);
-        border: 1px solid var(--panel-border);
-        border-radius: 14px;
-        box-shadow: var(--panel-shadow);
-      }
-
-      .chip {
-        align-self: flex-start;
-        padding: 0.35rem 0.75rem;
-        color: var(--text-muted);
-        background: rgba(0, 0, 0, 0.03);
-        border: 1px solid rgba(11, 11, 11, 0.04);
-        border-radius: 999px;
-        font-size: 0.85rem;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
-
-      h1 {
-        max-width: 760px;
-        margin: 0;
-        font-size: clamp(2.5rem, 6vw, 3.5rem);
-        line-height: 1.1;
-        letter-spacing: -0.035em;
-      }
-
-      .intro {
-        max-width: 62ch;
-        margin: 0;
-        color: var(--text-muted);
-        font-size: 1.1rem;
-        line-height: 1.7;
-      }
-
-      .services {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 1.25rem;
-        margin-top: 3rem;
-      }
-
-      .service {
-        position: relative;
-        display: flex;
-        min-height: 220px;
-        flex-direction: column;
-        padding: 1.5rem;
-        color: var(--text-primary);
-        background: var(--panel-bg);
-        border: 1px solid var(--panel-border);
-        border-radius: 16px;
-        box-shadow: var(--panel-shadow);
-        text-decoration: none;
-        transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-      }
-
-      .service:hover, .service:focus-visible {
-        color: var(--text-primary);
-        outline: none;
-        border-color: rgba(11, 11, 11, 0.2);
-        box-shadow: 0 18px 42px rgba(11, 11, 11, 0.09);
-        transform: translateY(-3px);
-      }
-
-      .service-meta {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        color: var(--text-muted);
-        font-size: 0.78rem;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
-
-      .arrow { color: var(--text-primary); font-size: 1.2rem; transition: transform 0.2s ease; }
-      .service:hover .arrow, .service:focus-visible .arrow { transform: translate(3px, -3px); }
-
-      .service h2 {
-        margin: auto 0 0.5rem;
-        font-size: 1.6rem;
-        letter-spacing: -0.025em;
-      }
-
-      .service p {
-        max-width: 42ch;
-        margin: 0;
-        color: var(--text-muted);
-        line-height: 1.6;
-      }
-
-      .badge {
-        display: inline-flex;
-        margin-left: 0.45rem;
-        padding: 0.25rem 0.5rem;
-        color: var(--text-muted);
-        background: rgba(0, 0, 0, 0.03);
-        border: 1px solid var(--panel-border);
-        border-radius: 999px;
-        font-size: 0.62rem;
-        letter-spacing: 0.07em;
-        vertical-align: middle;
-        text-transform: uppercase;
-      }
-
-      footer {
-        display: flex;
-        justify-content: space-between;
-        gap: 1rem;
-        padding: 1.5rem 0 0;
-        color: var(--text-muted);
-        font-size: 0.82rem;
-      }
-
-      footer a { color: inherit; }
-
-      @media (max-width: 720px) {
-        .nav-inner { min-height: 72px; padding-inline: 1.25rem; }
-        main { padding: 6rem 1.25rem 3rem; }
-        .hero { padding: 2.25rem; }
-        .services { grid-template-columns: 1fr; margin-top: 2rem; }
-        .service { min-height: 200px; }
-        footer { flex-direction: column; }
-      }
-
-      @media (prefers-reduced-motion: reduce) {
-        html { scroll-behavior: auto; }
-        .service, .arrow { transition: none; }
-      }
-    </style>
+    <meta name="description" content="A private room of useful services for Feifan's invited friends." />
+    <link rel="stylesheet" href="/lounge.css" />
   </head>
   <body>
-    <nav aria-label="Lounge navigation">
-      <div class="nav-inner">
-        <a class="brand" href="/">Feifan’s Lounge</a>
-        <a class="back-link" href="https://feifan.dev">Back to feifan.dev</a>
-      </div>
-    </nav>
+    <a class="skip-link" href="#service-list">Skip the room tour</a>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Feifan’s Lounge home"><span class="brand-mark" aria-hidden="true">f</span><span>Feifan’s Lounge</span></a>
+      <div class="topbar-actions"><span class="invitation">Invitation only</span><a href="https://feifan.dev">Back to feifan.dev</a></div>
+    </header>
 
     <main>
-      <header class="hero">
-        <span class="chip">Access by invitation</span>
-        <h1>A shared space for invited friends.</h1>
-        <p class="intro">
-          The Lounge link is visible on feifan.dev, but entry is reserved for
-          invited people. Sign in with your invited email to continue.
-        </p>
-      </header>
-
-      <section class="services" aria-label="Private services">
-        <a class="service" href="https://discounts.feifan.dev">
-          <span class="service-meta"><span>01 · Save</span><span class="arrow" aria-hidden="true">↗</span></span>
-          <h2>Discount Tracker</h2>
-          <p>Keep an eye on Australian gift-card offers and deals worth knowing about.</p>
-        </a>
-
-        <a class="service" href="https://seerr.feifan.dev">
-          <span class="service-meta"><span>02 · Request</span><span class="arrow" aria-hidden="true">↗</span></span>
-          <h2>Request a title</h2>
-          <p>Ask for a film or series to be added to the shared library.</p>
-        </a>
-
-        <a class="service" href="https://jellyfin.feifan.dev">
-          <span class="service-meta"><span>03 · Watch</span><span class="arrow" aria-hidden="true">↗</span></span>
-          <h2>Jellyfin</h2>
-          <p>Open the shared library and carry on watching.</p>
-        </a>
-
-        <a class="service" href="https://home.feifan.dev">
-          <span class="service-meta"><span>04 · Manage</span><span class="arrow" aria-hidden="true">↗</span></span>
-          <h2>Home <span class="badge">Owner only</span></h2>
-          <p>Private home-server status and controls, restricted to Feifan.</p>
-        </a>
-        <a class="service" href="/ppt/">
-          <span class="service-meta"><span>05 · Create</span><span class="arrow" aria-hidden="true">↗</span></span>
-          <h2>Slide Studio</h2>
-          <p>Build an editable PowerPoint deck with themed layouts and AI-assisted sample text.</p>
-        </a>
+      <section class="room-shell" aria-labelledby="room-title">
+        <canvas id="lounge-canvas" aria-label="Interactive three-dimensional lounge room"></canvas>
+        <div class="ambient" aria-hidden="true"></div>
+        <div class="intro" id="intro">
+          <p class="eyebrow">A room of useful things</p>
+          <h1 id="room-title">Come in.<br />Look around.</h1>
+          <p>Tour the room or choose an object. Each one opens a service shared with invited friends.</p>
+          <button class="primary-action" id="start-tour" type="button">Start room tour <span aria-hidden="true">→</span></button>
+        </div>
+        <div class="scene-status" id="scene-status" aria-live="polite">
+          <span class="status-number" id="status-number">Room</span>
+          <div><strong id="status-title">Feifan’s Lounge</strong><span id="status-copy">Drag to look around, scroll to zoom, or select an object.</span></div>
+        </div>
+        <nav class="tour-controls" aria-label="Room tour controls">
+          <button id="tour-previous" type="button" aria-label="Previous tour stop">←</button><span id="tour-position">Overview</span><button id="tour-next" type="button" aria-label="Next tour stop">→</button>
+        </nav>
+        <div class="hotspot-list" aria-label="Objects in the room">
+          <button type="button" data-stop="seerr"><span>01</span> DVD cabinet</button>
+          <button type="button" data-stop="jellyfin"><span>02</span> Television</button>
+          <button type="button" data-stop="discounts"><span>03</span> Pin board</button>
+          <button type="button" data-stop="ppt"><span>04</span> Slide carousel</button>
+        </div>
+        <div class="service-card" id="service-card" hidden>
+          <button class="card-close" id="card-close" type="button" aria-label="Close service details">×</button>
+          <p class="eyebrow" id="card-type"></p><h2 id="card-title"></h2><p id="card-copy"></p><a id="card-link" href="#">Open service <span aria-hidden="true">↗</span></a>
+        </div>
+        <p class="webgl-message" id="webgl-message" hidden>The interactive room is unavailable on this device. Every service remains available below.</p>
       </section>
 
-      <footer>
-        <span>Access is limited to invited accounts; individual services may also require sign-in.</span>
-        <a href="https://feifan.dev">feifan.dev</a>
-      </footer>
+      <section class="service-directory" id="service-list" aria-labelledby="directory-title">
+        <div class="directory-heading"><p class="eyebrow">Everything in the room</p><h2 id="directory-title">Choose a corner.</h2></div>
+        <div class="services">
+          <a href="https://seerr.feifan.dev"><span>01 · Cabinet</span><strong>Request a title</strong><small>Find a film or series for the shared library.</small></a>
+          <a href="https://jellyfin.feifan.dev"><span>02 · Television</span><strong>Jellyfin</strong><small>Open the library and carry on watching.</small></a>
+          <a href="https://discounts.feifan.dev"><span>03 · Pin board</span><strong>Discount Tracker</strong><small>See current Australian gift-card offers.</small></a>
+          <a href="/ppt/"><span>04 · Carousel</span><strong>PowerPoint Studio</strong><small>Create editable, AI-assisted slide decks.</small></a>
+          <a class="owner-service" href="https://home.feifan.dev"><span>05 · Private desk</span><strong>Home controls</strong><small>Owner-only server status and controls.</small></a>
+        </div>
+      </section>
     </main>
+
+    <footer><span>Access is limited to invited accounts. Individual services may require another sign-in.</span><a href="https://feifan.dev">feifan.dev</a></footer>
+    <script type="module" src="/lounge.js"></script>
   </body>
 </html>
