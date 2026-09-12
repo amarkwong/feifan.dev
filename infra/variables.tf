@@ -36,7 +36,7 @@ variable "github_repo" {
 variable "node_version" {
   type        = string
   description = "Node version used during Cloudflare Pages builds"
-  default     = "20.9.0"
+  default     = "24.15.0"
 }
 
 variable "build_command" {
