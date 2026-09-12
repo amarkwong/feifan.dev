@@ -1,0 +1,14 @@
+---
+import Layout from '../../layouts/Layout.astro';
+export async function getStaticPaths() {
+  const entries = Object.values(import.meta.glob('../../content/thoughts/*.md', { eager: true })) as any[];
+  return entries.map(entry => ({ params: { slug: entry.frontmatter.slug }, props: { entry } }));
+}
+const { entry } = Astro.props;
+const { Content, frontmatter } = entry;
+---
+<Layout title={`${frontmatter.title} — feifan.dev`}>
+  <a href="/thoughts">← All thoughts</a>
+  <article><h1>{frontmatter.title}</h1>{!frontmatter.published && <p class="status">Not yet published.</p>}<Content /></article>
+</Layout>
+<style>h1{font-size:clamp(2rem,5vw,3.3rem);line-height:1.15;letter-spacing:-.035em;margin:0 0 24px}.status{color:var(--text-muted);font-size:.9rem}</style>

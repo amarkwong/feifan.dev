@@ -8,7 +8,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   use: {
-    baseURL: 'https://feifan.dev',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'https://feifan.dev',
     trace: 'on-first-retry',
   },
   projects: [
