@@ -161,8 +161,8 @@ if (renderer) {
   }
   annulus(.91, .38, .13, trayBlack, tray);
   const clear = standard(0xdce9ed, { transparent: true, opacity: .24, metalness: .15, roughness: .2, depthWrite: false });
-  annulus(.91, .88, .48, clear, tray);
-  annulus(.42, .39, .48, clear, tray);
+  annulus(.91, .88, .34, clear, tray).position.y = .14;
+  annulus(.42, .39, .34, clear, tray).position.y = .14;
   for (let i = 0; i < 80; i++) {
     const angle = i * Math.PI / 40;
     const slot = box([.45, .29, .009], [Math.cos(angle) * .65, .29, Math.sin(angle) * .65], standard(0xc5d1d3, { roughness: .45 }), tray);
