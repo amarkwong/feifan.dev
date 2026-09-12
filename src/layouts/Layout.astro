@@ -10,6 +10,7 @@ const { title } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5f3ed" />
     <title>{title}</title>
     <link rel="stylesheet" href="/styles/global.css" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
@@ -46,7 +47,7 @@ const { title } = Astro.props;
   section {
     margin: 0;
     padding: 2rem;
-    border-radius: 14px;
+    border-radius: 10px;
     background: var(--panel-bg);
     border: 1px solid var(--panel-border);
     box-shadow: var(--panel-shadow);
@@ -54,7 +55,7 @@ const { title } = Astro.props;
   h2 {
     font-size: 2rem;
     margin-bottom: 1rem;
-    letter-spacing: 0.04em;
+    letter-spacing: -0.02em;
     text-transform: none;
     color: var(--text-primary);
   }

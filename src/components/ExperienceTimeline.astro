@@ -95,7 +95,7 @@ const { items } = Astro.props;
     bottom: 0;
     left: 50%;
     width: 2px;
-    background: rgba(11, 11, 11, 0.12);
+    background: var(--panel-border);
     transform: translateX(-50%);
   }
 
@@ -129,7 +129,7 @@ const { items } = Astro.props;
     border-radius: 999px;
     padding: 0.1rem 0.65rem;
     white-space: nowrap;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 6px 18px rgba(38, 61, 50, 0.08);
   }
 
   .timeline__card {
@@ -172,8 +172,8 @@ const { items } = Astro.props;
   .timeline__tech li {
     padding: 0.35rem 0.75rem;
     border-radius: 999px;
-    background: rgba(0, 0, 0, 0.04);
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: var(--accent-soft);
+    border: 1px solid var(--panel-border);
     font-size: 0.85rem;
     color: var(--text-muted);
   }
@@ -212,17 +212,17 @@ const { items } = Astro.props;
   }
 
   .project-accordion details {
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--panel-border);
     border-radius: 14px;
-    background: rgba(0, 0, 0, 0.03);
+    background: var(--surface-muted);
     padding: 0.35rem 0.75rem;
     transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
   }
 
   .project-accordion details[open] {
-    background: rgba(0, 0, 0, 0.04);
-    border-color: rgba(0, 0, 0, 0.2);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+    background: var(--accent-soft);
+    border-color: var(--focus-ring);
+    box-shadow: 0 12px 24px rgba(38, 61, 50, 0.08);
   }
 
   .project-accordion summary {
@@ -273,7 +273,7 @@ const { items } = Astro.props;
   .project-panel a {
     font-weight: 600;
     text-decoration: none;
-    color: var(--text-primary);
+    color: var(--accent);
   }
 
   .project-panel a:hover,

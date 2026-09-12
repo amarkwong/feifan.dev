@@ -1,12 +1,16 @@
 :root {
-  --bg-base: #ffffff;
-  --text-primary: #0b0b0b;
-  --text-muted: rgba(11, 11, 11, 0.65);
-  --accent: #000000;
-  --accent-strong: #222222;
-  --panel-bg: #ffffff;
-  --panel-border: rgba(11, 11, 11, 0.06);
-  --panel-shadow: 0 12px 32px rgba(11, 11, 11, 0.06);
+  color-scheme: light;
+  --bg-base: #f5f3ed;
+  --text-primary: #233c38;
+  --text-muted: #65766e;
+  --accent: #274b3e;
+  --accent-strong: #18372d;
+  --accent-soft: #e8eee3;
+  --surface-muted: #f7f7f2;
+  --panel-bg: #fffdfa;
+  --panel-border: #d7dbd0;
+  --panel-shadow: 0 15px 45px rgba(38, 61, 50, 0.07);
+  --focus-ring: #6c8651;
 }
 
 * {
@@ -20,6 +24,17 @@ body {
   color: var(--text-primary);
   background: var(--bg-base);
   position: relative;
+}
+
+::selection {
+  color: #fff;
+  background: var(--accent);
+}
+
+h1,
+h2,
+h3 {
+  font-family: Georgia, 'Times New Roman', serif;
 }
 
 main, nav, section, header, footer {
@@ -45,10 +60,17 @@ a:focus-visible {
   color: var(--accent-strong);
 }
 
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
 .glass-panel {
   background: var(--panel-bg);
   border: 1px solid var(--panel-border);
-  border-radius: 14px;
+  border-radius: 10px;
   box-shadow: var(--panel-shadow);
 }
 
@@ -61,9 +83,9 @@ a:focus-visible {
   font-size: 0.85rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(11, 11, 11, 0.04);
-  color: var(--text-muted);
+  background: var(--accent-soft);
+  border: 1px solid var(--panel-border);
+  color: var(--accent);
 }
 
 .notion-image {
@@ -87,7 +109,7 @@ a:focus-visible {
   margin: 1.5rem auto;
   padding: 1rem;
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.02);
+  background: var(--surface-muted);
   font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
   font-size: 1.1rem;
   text-align: center;
