@@ -28,12 +28,13 @@ const stops = {
     href: 'https://discounts.feifan.dev', camera: [6.35, 3.15, 2.4], target: [4.45, 2.25, -3.62],
   },
   ppt: {
-    label: 'Slide carousel', number: '04', type: 'Create · Present', title: 'PowerPoint Studio',
+    label: 'Carousel projector', number: '04', type: 'Create · Present', title: 'PowerPoint Studio',
     copy: 'Turn a topic into an editable deck with curated layouts and AI-assisted copy.',
     href: '/ppt/', camera: [5.6, 3.2, 5.5], target: [3.55, 1.35, 0.8],
   },
 };
-const tourOrder = ['overview', 'seerr', 'jellyfin', 'discounts', 'ppt'];
+stops.home = { label: 'Mac Pro', number: '05', type: 'Home Server · Owner only', title: 'Home Server', copy: 'Open the private server dashboard. Access is restricted to Feifan.', href: 'https://home.feifan.dev', camera: [7.5, 2.8, 1.8], target: [6.4, 1.1, -2.4] };
+const tourOrder = ['overview', 'seerr', 'jellyfin', 'discounts', 'ppt', 'home'];
 let currentStop = 'overview';
 let renderer;
 
@@ -117,7 +118,7 @@ if (renderer) {
     const board = document.createElement('canvas'); board.width = 640; board.height = 360;
     const context = board.getContext('2d'); context.fillStyle = colors.background || '#142c28'; context.fillRect(0, 0, board.width, board.height);
     context.textAlign = 'center'; context.fillStyle = colors.accent || '#e1bd78'; context.font = '700 28px system-ui'; context.fillText(lines[0], 320, 115);
-    context.fillStyle = colors.foreground || '#f3f0e7'; context.font = '52px Georgia'; context.fillText(lines[1], 320, 190);
+    context.fillStyle = colors.foreground || '#f3f0e7'; context.font = '500 48px system-ui'; context.fillText(lines[1], 320, 190);
     if (lines[2]) { context.fillStyle = colors.muted || '#aabbb2'; context.font = '24px system-ui'; context.fillText(lines[2], 320, 240); }
     const texture = new THREE.CanvasTexture(board); texture.colorSpace = THREE.SRGBColorSpace; return texture;
   }
@@ -143,22 +144,44 @@ if (renderer) {
   });
   markInteractive(pinboard, 'discounts');
 
-  const carousel = new THREE.Group(); carousel.position.set(3.45, 0, .8); scene.add(carousel);
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.85, .32, 48), standard(0x9a704c, { metalness: .2 })); base.position.y = .18; base.castShadow = true; carousel.add(base);
-  const carouselSpin = new THREE.Group(); carouselSpin.position.y = .42; carousel.add(carouselSpin);
-  const pole = new THREE.Mesh(new THREE.CylinderGeometry(.06, .06, 2.7, 16), standard(0xd3b66f, { metalness: .65 })); pole.position.y = 1.25; carouselSpin.add(pole);
-  const slideMaterials = [
-    textTexture(['LAYOUT 01', 'Clear ideas', 'An editable slide deck'], { background: '#f3f0e7', foreground: '#203d36', accent: '#56715e', muted: '#66776f' }),
-    textTexture(['LAYOUT 02', 'Tell the story', 'Designed to be changed'], { background: '#7e2838', foreground: '#fff8ef', accent: '#e1bd78', muted: '#edd9d0' }),
-    textTexture(['LAYOUT 03', 'Make it yours', 'AI-assisted content'], { background: '#203d36', foreground: '#fffdf8', accent: '#e1bd78', muted: '#dfe7da' }),
-    textTexture(['LAYOUT 04', 'Present well', 'Download as PowerPoint'], { background: '#d8a06c', foreground: '#203d36', accent: '#7e2838', muted: '#4f625a' }),
-  ];
-  slideMaterials.forEach((texture, index) => {
-    const angle = index * Math.PI / 2;
-    const slide = box([1.75, 1.02, .07], [Math.cos(angle) * 1.15, 1.55, Math.sin(angle) * 1.15], standard(0xffffff, { map: texture }), carouselSpin);
-    slide.rotation.y = -angle + Math.PI / 2;
-  });
-  markInteractive(carousel, 'ppt');
+  // Kodak-style carousel projector: low body, horizontal slide tray, front lens.
+  const projector = new THREE.Group(); projector.position.set(3.45, 0, .8); scene.add(projector);
+  box([2.8, .16, 2.1], [0, .9, 0], standard(0x885d3c), projector);
+  for (const x of [-1.15, 1.15]) for (const z of [-.8, .8]) box([.12, .9, .12], [x, .45, z], standard(0x553c2f), projector);
+  box([1.8, .48, 1.35], [0, 1.22, 0], standard(0xd0c3a5), projector);
+  box([1.8, .12, 1.35], [0, 1, 0], standard(0x292923), projector);
+  const tray = new THREE.Group(); tray.position.set(-.1, 1.56, -.1); projector.add(tray);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(.62, .12, 12, 64), standard(0x292923)); ring.rotation.x = Math.PI / 2; tray.add(ring);
+  const hub = new THREE.Mesh(new THREE.CylinderGeometry(.23, .23, .15, 32), standard(0x393a32)); tray.add(hub);
+  for (let i = 0; i < 60; i++) {
+    const angle = i * Math.PI / 30;
+    const slot = box([.26, .16, .018], [Math.cos(angle) * .48, .02, Math.sin(angle) * .48], standard(i % 5 ? 0x52534a : 0xe5ddc9), tray);
+    slot.rotation.y = -angle;
+  }
+  const lens = new THREE.Mesh(new THREE.CylinderGeometry(.22, .25, .45, 32), standard(0x252a28, { metalness: .5 })); lens.rotation.x = Math.PI / 2; lens.position.set(.48, 1.23, .82); projector.add(lens);
+  const glass = new THREE.Mesh(new THREE.CircleGeometry(.18, 32), standard(0xe9d69c, { emissive: 0xffcb76, emissiveIntensity: .8 })); glass.position.set(.48, 1.23, 1.05); projector.add(glass);
+  box([.44, .12, .025], [-.48, 1.23, .69], standard(0xc99433), projector);
+  for (let i = 0; i < 8; i++) box([.015, .19, .025], [-.75 + i * .055, 1.2, .69], standard(0x393a32), projector);
+  markInteractive(projector, 'ppt');
+
+  // Aluminum tower with handles, feet, and perforated front grille.
+  const mac = new THREE.Group(); mac.position.set(6.4, 0, -2.4); scene.add(mac);
+  const aluminum = standard(0xbfc6c7, { metalness: .65, roughness: .35 });
+  box([.95, 1.9, 1.3], [0, 1.13, 0], aluminum, mac);
+  for (const x of [-.37, .37]) {
+    box([.09, .24, 1.05], [x, .14, 0], aluminum, mac);
+    box([.09, .1, .85], [x, 2.27, 0], aluminum, mac);
+    for (const z of [-.38, .38]) box([.09, .2, .09], [x, 2.17, z], aluminum, mac);
+  }
+  box([.83, 1.72, .025], [0, 1.1, .665], standard(0x7c898d), mac);
+  const holeGeometry = new THREE.CircleGeometry(.043, 8);
+  const holeMaterial = standard(0x253333);
+  for (let row = 0; row < 17; row++) for (let col = 0; col < 7; col++) {
+    const hole = new THREE.Mesh(holeGeometry, holeMaterial);
+    hole.position.set(-.33 + col * .105 + (row % 2) * .035, .32 + row * .096, .683); mac.add(hole);
+  }
+  box([.04, .025, .025], [.3, 1.97, .68], standard(0xbfe5c9, { emissive: 0x90cba7, emissiveIntensity: .5 }), mac);
+  markInteractive(mac, 'home');
 
   const lamp = new THREE.Group(); lamp.position.set(6, 0, 2.6); scene.add(lamp);
   const lampPole = new THREE.Mesh(new THREE.CylinderGeometry(.035, .05, 3.4, 12), standard(0xc8ad72, { metalness: .55 })); lampPole.position.y = 1.7; lamp.add(lampPole);
@@ -245,7 +268,7 @@ if (renderer) {
   function animate(time) {
     resize();
     const elapsed = Math.min((time - lastTime) / 1000, .1); lastTime = time;
-    if (!reducedMotion) carouselSpin.rotation.y += elapsed * .25;
+
     const orbit = basePosition.clone().sub(baseTarget);
     orbit.applyAxisAngle(new THREE.Vector3(0, 1, 0), yawOffset);
     orbit.multiplyScalar(zoomFactor);
