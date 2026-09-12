@@ -40,8 +40,8 @@ preview_env_vars = {
 # defaults (mx_priority = 10, dkim_selector = "resend",
 # return_path_subdomain = "send", manage_dmarc = true, dmarc_rua = "").
 resend_sending_domains = {
-  # Discount Tracker <notifications@giftcards.feifan.dev>
-  "giftcards.feifan.dev" = {
+  # Discount Tracker <notifications@discounts.feifan.dev>
+  "discounts.feifan.dev" = {
     mx_value   = "" # e.g. "feedback-smtp.<region>.amazonses.com"
     spf_value  = "" # e.g. "v=spf1 include:amazonses.com ~all"
     dkim_value = "" # long "p=..." value from Resend

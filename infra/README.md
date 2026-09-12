@@ -70,24 +70,24 @@ If you later need Workers, R2, or KV bindings, extend `deployment_configs` with 
 
 ## Resend email DNS (Discount Tracker)
 
-Terraform also manages the DNS records that verify `giftcards.feifan.dev` as a
+Terraform also manages the DNS records that verify `discounts.feifan.dev` as a
 Resend sending domain, so the separately hosted Discount Tracker app can send
-transactional email as **`Discount Tracker <notifications@giftcards.feifan.dev>`**.
+transactional email as **`Discount Tracker <notifications@discounts.feifan.dev>`**.
 
 Scope notes:
 
 - Only DNS lives here. Email code, templates, user preferences, and the
   **Resend API key** belong to the DiscountTracker repository — never put the
   API key in Terraform, tfvars, Cloudflare, or state.
-- The existing record serving the app at `giftcards.feifan.dev` is not managed
+- The existing record serving the app at `discounts.feifan.dev` is not managed
   or modified by these resources; the email records use different names
-  (`send.giftcards`, `resend._domainkey.giftcards`, `_dmarc.giftcards`).
-- DMARC is published only at `_dmarc.giftcards.feifan.dev` with a conservative
+  (`send.discounts`, `resend._domainkey.discounts`, `_dmarc.discounts`).
+- DMARC is published only at `_dmarc.discounts.feifan.dev` with a conservative
   `p=none` policy. The parent `feifan.dev` domain is untouched.
 
 ### 1. Copy values from Resend
 
-In the Resend dashboard, add the domain `giftcards.feifan.dev`
+In the Resend dashboard, add the domain `discounts.feifan.dev`
 (Resend → Domains → Add Domain), then copy from its verification screen:
 
 | Resend screen shows | Put it in (terraform.tfvars) |
@@ -115,10 +115,10 @@ terraform apply
 
 Expected records (all DNS-only / grey-cloud, in the `feifan.dev` zone):
 
-- `send.giftcards.feifan.dev` — MX → the Resend/SES feedback target
-- `send.giftcards.feifan.dev` — TXT (SPF)
-- `resend._domainkey.giftcards.feifan.dev` — TXT (DKIM)
-- `_dmarc.giftcards.feifan.dev` — TXT `v=DMARC1; p=none;`
+- `send.discounts.feifan.dev` — MX → the Resend/SES feedback target
+- `send.discounts.feifan.dev` — TXT (SPF)
+- `resend._domainkey.discounts.feifan.dev` — TXT (DKIM)
+- `_dmarc.discounts.feifan.dev` — TXT `v=DMARC1; p=none;`
 
 ### 3. Verify in Resend
 
@@ -127,14 +127,14 @@ press **Verify DNS Records** on the domain's page in Resend → Domains. Status
 should move to *Verified*. You can check propagation yourself with:
 
 ```bash
-dig +short MX send.giftcards.feifan.dev
-dig +short TXT send.giftcards.feifan.dev
-dig +short TXT resend._domainkey.giftcards.feifan.dev
-dig +short TXT _dmarc.giftcards.feifan.dev
+dig +short MX send.discounts.feifan.dev
+dig +short TXT send.discounts.feifan.dev
+dig +short TXT resend._domainkey.discounts.feifan.dev
+dig +short TXT _dmarc.discounts.feifan.dev
 ```
 
 Once verified, the Discount Tracker runtime (configured in its own repo with
-the Resend API key) can send from `notifications@giftcards.feifan.dev`.
+the Resend API key) can send from `notifications@discounts.feifan.dev`.
 
 ## Private Lounge access
 
