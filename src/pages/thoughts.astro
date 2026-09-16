@@ -1,14 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
 const articles = [
-  { title: 'EnergyHub, a side project to reduce your electricity bill', href: '/thoughts/energyhub' },
-  { title: 'The flow of information in AI era', href: '/thoughts/information-in-ai-era' },
+  { title: 'Your Electricity Bill Has a Total. Does It Have an Explanation?', href: '/thoughts/energyhub', published: true },
+  { title: 'The flow of information in AI era', href: '/thoughts/information-in-ai-era', published: false },
 ];
 ---
 <Layout title="Thoughts — feifan.dev">
   <header><p class="eyebrow">Personal writing</p><h1>Thoughts.</h1></header>
   <div class="writing" aria-label="Articles">
-    {articles.map((article, index) => <a href={article.href}><span class="number">0{index + 1}</span><div><h2>{article.title}</h2><span class="status">Not yet published</span></div><span aria-hidden="true">↗</span></a>)}
+    {articles.map((article, index) => <a href={article.href}><span class="number">0{index + 1}</span><div><h2>{article.title}</h2><span class="status">{article.published ? 'Read article' : 'Not yet published'}</span></div><span aria-hidden="true">↗</span></a>)}
   </div>
 </Layout>
 <style>

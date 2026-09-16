@@ -183,3 +183,36 @@ credentials before a full plan. Never disable Access simply to run a plan. The
 initial /ppt deployment used a reviewed targeted plan for its three new resources
 and the existing tunnel configuration because Auth0 management credentials were
 not available in this shell. All prior tunnel routes were preserved.
+
+## Universal Login branding
+
+`auth0-branding.tf` styles Auth0's native Universal Login with the site's Inter
+font, logo, beige background and green controls. This is tenant-wide, including
+signup and password reset, not just the Lounge application. Authentication and
+allowlists remain in their existing resources. The font uses Inter's public CDN
+(with CORS enabled); the logo uses the public site rather than the private Lounge.
+
+Before the first apply, load the existing Auth0 M2M credentials into
+`AUTH0_CLIENT_ID` and `AUTH0_CLIENT_SECRET`. Its Management API grant needs
+`read:branding`, `update:branding`, `create:branding`, `read:prompts`, and
+`update:prompts` in addition to the existing infrastructure permissions.
+Do not paste secrets into chat or commit them.
+
+Read and preserve the live branding and prompt settings before applying. Import
+existing singleton settings with these commands (the IDs are arbitrary labels):
+
+```sh
+terraform import 'auth0_branding.lounge[0]' feifan-branding
+terraform import 'auth0_prompt.lounge[0]' feifan-prompts
+```
+
+If `GET /api/v2/branding/themes/default` returns an existing theme, import its
+`themeId` into `auth0_branding_theme.lounge[0]` before planning. This preserves
+Terraform ownership of the existing theme rather than attempting a duplicate.
+Then run `terraform plan -out=branding.tfplan`, review for unrelated changes,
+and apply the reviewed plan with `terraform apply branding.tfplan`.
+Keep plan files private as they can contain infrastructure secrets.
+
+After applying, use a private browser window to visit `https://lounge.feifan.dev`
+and verify login, signup and password-reset screens at desktop and mobile sizes.
+No custom domain or custom HTML login page is needed for this native theme.
