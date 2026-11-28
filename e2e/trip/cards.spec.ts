@@ -22,6 +22,8 @@ const apply = (page: Page) => page.click('#edit-form button[type=submit]');
 test.describe('stays', () => {
   test('hotel details are editable and shown on the card', async ({ join }) => {
     const { page, errors } = await join(OWNER);
+    await page.route('https://en.wikipedia.org/w/api.php?**', route => route.fulfill({contentType:'application/json',body:JSON.stringify({query:{pages:{1:{title:'Park Hyatt',thumbnail:{source:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Park_Hyatt_logo.svg/240px-Park_Hyatt_logo.svg.png'}}}}})}));
+    await page.route('https://upload.wikimedia.org/**', route => route.fulfill({contentType:'image/png',body:PNG}));
     await synced(page);
     await addHotel(page);
     await page.fill('input[name=brand]', 'Park Hyatt');
@@ -45,6 +47,21 @@ test.describe('stays', () => {
     await page.click('#cards .card.hotel', { position: { x: 20, y: 20 } });
     await expect(page.locator('input[name=confirmation]')).toHaveValue('AB12CD');
     await expect(page.locator('input[name=bookingUrl]')).toHaveValue('https://hyatt.example/booking');
+    expect(errors).toEqual([]);
+  });
+
+  test('a local-language hotel brand adds its recognised logo badge', async ({ join }) => {
+    const { page, errors } = await join(OWNER);
+    await page.route('https://en.wikipedia.org/w/api.php?**', route => route.fulfill({contentType:'application/json',body:JSON.stringify({query:{pages:{1:{title:'Park Hyatt',thumbnail:{source:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Park_Hyatt_logo.svg/240px-Park_Hyatt_logo.svg.png'}}}}})}));
+    await page.route('https://upload.wikimedia.org/**', route => route.fulfill({contentType:'image/png',body:PNG}));
+    await addHotel(page);
+    await page.fill('input[name=brand]', '柏悦');
+    await page.fill('input[name=title]', '北京柏悦酒店');
+    await apply(page);
+    const card=page.locator('#cards .card.hotel');
+    await expect(card.locator('strong')).toContainText('北京柏悦酒店');
+    await expect(card.locator('.hotel-brand-badge')).toHaveAttribute('title','Park Hyatt');
+    await expect(card.locator('.hotel-brand-badge img')).toHaveAttribute('src',/upload\.wikimedia\.org/);
     expect(errors).toEqual([]);
   });
 

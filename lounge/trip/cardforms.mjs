@@ -4,6 +4,7 @@ import {safeImageSrc,safeLink} from './model.mjs';
 import {airports,airportNames} from './data.mjs';
 import {airlineFor,parseFlightNo,lookupFlight,gridSpan,hhmm,minutesText} from './flight.mjs';
 import {findPhotos,resizeImage} from './media.mjs';
+import {hotelBrands} from './hotels.mjs';
 
 const CURRENCIES=['AUD','CNY','JPY','USD','SGD','EUR','GBP'];
 const text=(f,k)=>String(f.get(k)??'').trim();
@@ -17,7 +18,9 @@ function photoPreview(img){
   return `<img src="${esc(img.src)}" alt=""><span>${esc(img.credit||'')}${link}</span>`;
 }
 
-export const hotelFields=x=>`<label class="full">BRAND / CHAIN<input name="brand" maxlength="60" value="${esc(x.brand||'')}" placeholder="e.g. Park Hyatt, Hoshinoya, Ibis"></label>
+export const hotelFields=x=>`<label class="full">BRAND / CHAIN<input name="brand" list="hotel-brands" maxlength="60" value="${esc(x.brand||'')}" placeholder="e.g. Park Hyatt, Hoshinoya, Atour"></label>
+<datalist id="hotel-brands">${hotelBrands.flatMap(b=>[`<option value="${esc(b.name)}"></option>`,...b.aliases.map(a=>`<option value="${esc(a)}">${esc(b.name)}</option>`)]).join('')}</datalist>
+<p class="connection-hint">The property name and every stay detail are editable. Recognised hotel brands add a logo badge automatically.</p>
 <label>ROOM TYPE<input name="roomType" maxlength="60" value="${esc(x.roomType||'')}" placeholder="King, twin…"></label>
 <label>GUESTS<input name="guests" type="number" min="1" max="12" step="1" value="${esc(x.guests??2)}"></label>
 <label>PRICE PER NIGHT<input name="price" type="number" min="0" max="10000000" step="1" value="${esc(x.price??'')}" placeholder="Optional"></label>

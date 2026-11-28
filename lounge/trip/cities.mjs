@@ -8,12 +8,19 @@ const china=[
  ['Ürümqi','乌鲁木齐',['Urumqi']],['Kashgar','喀什'],['Dunhuang','敦煌'],['Lanzhou','兰州'],['Xining','西宁'],['Yinchuan','银川'],['Hohhot','呼和浩特'],['Ningbo','宁波'],['Wuxi','无锡'],['Zhuhai','珠海'],
  ['Macau','澳门',['Macao']],['Hong Kong','香港']
 ];
-const japan=[['Kyoto','京都'],['Tokyo','東京'],['Osaka','大阪'],['Nara','奈良'],['Kanazawa','金沢'],['Hiroshima','広島'],['Fukuoka','福岡'],['Sapporo','札幌']];
+const japan=[
+ ['Tokyo','東京'],['Kyoto','京都'],['Osaka','大阪'],['Nara','奈良'],['Yokohama','横浜'],['Kamakura','鎌倉'],['Hakone','箱根'],['Nikko','日光',['Nikkō']],['Kanazawa','金沢'],['Takayama','高山',['Hida Takayama'],'Takayama, Gifu'],
+ ['Shirakawa-go','白川郷',['Shirakawago']],['Nagoya','名古屋'],['Hiroshima','広島'],['Miyajima','宮島',['Itsukushima'],'Itsukushima'],['Fukuoka','福岡'],['Sapporo','札幌'],['Otaru','小樽'],['Hakodate','函館'],['Furano','富良野',[],'Furano, Hokkaido'],['Biei','美瑛',[],'Biei, Hokkaido'],
+ ['Asahikawa','旭川'],['Sendai','仙台'],['Matsushima','松島',[],'Matsushima, Miyagi'],['Aomori','青森'],['Hirosaki','弘前'],['Morioka','盛岡'],['Akita','秋田'],['Yamagata','山形'],['Niigata','新潟'],['Nagano','長野'],
+ ['Matsumoto','松本'],['Karuizawa','軽井沢'],['Kusatsu','草津',[],'Kusatsu, Gunma'],['Kawagoe','川越'],['Chiba','千葉'],['Narita','成田'],['Izu','伊豆',[],'Izu, Shizuoka'],['Atami','熱海'],['Shizuoka','静岡'],['Hamamatsu','浜松'],
+ ['Kobe','神戸'],['Himeji','姫路'],['Okayama','岡山'],['Kurashiki','倉敷'],['Naoshima','直島',[],'Naoshima, Kagawa'],['Takamatsu','高松'],['Matsuyama','松山'],['Kochi','高知',['Kōchi'],'Kōchi (city)'],['Nagasaki','長崎'],['Kumamoto','熊本'],
+ ['Beppu','別府'],['Yufuin','由布院',['Yufu'],'Yufuin'],['Kagoshima','鹿児島'],['Yakushima','屋久島'],['Naha','那覇'],['Ishigaki','石垣',[],'Ishigaki, Okinawa']
+];
 const localFiles={Chengdu:'chengdu.jpg','Xi’an':'xian.jpg',Guangzhou:'guangzhou.jpg',Xiapu:'xiapu.jpg',Fuzhou:'fuzhou.jpg',Shanghai:'shanghai.jpg',Kyoto:'kyoto.jpg',Tokyo:'tokyo.jpg'};
 const localImageNames={Chengdu:'Anshun Bridge','Xi’an':'Giant Wild Goose Pagoda',Guangzhou:'Canton Tower',Xiapu:'Xiapu coast',Fuzhou:'Three Lanes and Seven Alleys',Shanghai:'Pudong skyline',Kyoto:'Yasaka Pagoda',Tokyo:'Tokyo Tower'};
 const normalise=value=>String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[’'`·.\-\s]/g,'');
 const rows=[...china.map(x=>['China',...x]),...japan.map(x=>['Japan',...x])];
-export const cityCatalogue=rows.map(([country,name,local,aliases=[]])=>({country,name,local,aliases,wikiTitle:aliases.find(x=>/County|City|Jiangxi/.test(x))||name,localFile:localFiles[name],imageName:localImageNames[name]}));
+export const cityCatalogue=rows.map(([country,name,local,aliases=[],wikiTitle])=>({country,name,local,aliases,wikiTitle:wikiTitle||aliases.find(x=>/County|City|Jiangxi/.test(x))||name,localFile:localFiles[name],imageName:localImageNames[name]}));
 const lookup=new Map();for(const city of cityCatalogue)for(const key of [city.name,city.local,...city.aliases])lookup.set(normalise(key),city);
 export const findCity=value=>lookup.get(normalise(value))||null;
 export const cityNames=country=>cityCatalogue.filter(x=>x.country===country).map(x=>x.name);
