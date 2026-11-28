@@ -99,6 +99,7 @@ export function change(s,id,patch){
  }
  scaleChildren(next.items,x,a,d);
  if(x.type==='country'&&patch.width!==undefined)for(const c of descendants(next.items,id).filter(c=>c.type==='city'))c.width=Math.max(110,Math.min(320,Math.round(c.width*patch.width/x.width)));
+ if(x.type==='city'&&patch.title!==undefined&&patch.title!==x.title)for(const child of descendants(next.items,id))if(child.type==='activity'&&child.city===x.title)child.city=patch.title;
  Object.assign(x,patch);return validate(reconcileConnections(next));
 }
 export function insert(s,item){const next=structuredClone(s);next.items.push(structuredClone(item));return validate(reconcileConnections(next))}

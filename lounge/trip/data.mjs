@@ -1,4 +1,5 @@
-export const cities={China:['Chengdu','Xi’an','Guangzhou','Xiapu','Fuzhou','Shanghai'],Japan:['Kyoto','Tokyo']};
+import {cityNames,cityLocalNames} from './cities.mjs';
+export const cities={China:cityNames('China'),Japan:cityNames('Japan')};
 export const glyph={country:'◈',city:'⌖',activity:'✦',logistics:'⇢'};
 export const activities=[
  {id:'panda',city:'Chengdu',title:'Panda Base morning',tag:'Wildlife',detail:'Winter morning entry starts at 08:00. Real-name reservation required; booking opens up to 14 days ahead. Allow a relaxed half-day.',source:'https://www.panda.org.cn/en/service/ticket/',status:'Year-round · winter hours checked'},
@@ -19,7 +20,7 @@ export const activities=[
 
 export const landmarks={"Chengdu": {"file": "chengdu.svg", "name": "Anshun Bridge"}, "Xi’an": {"file": "xian.svg", "name": "Giant Wild Goose Pagoda"}, "Guangzhou": {"file": "guangzhou.svg", "name": "Canton Tower"}, "Xiapu": {"file": "xiapu.svg", "name": "Dongbi coast"}, "Fuzhou": {"file": "fuzhou.svg", "name": "Three Lanes and Seven Alleys"}, "Shanghai": {"file": "shanghai.svg", "name": "Oriental Pearl Tower"}, "Kyoto": {"file": "kyoto.svg", "name": "Yasaka Pagoda"}, "Tokyo": {"file": "tokyo.svg", "name": "Tokyo Tower"}};
 
-export const localNames={China:'中国',Japan:'日本',Chengdu:'成都','Xi’an':'西安',Guangzhou:'广州',Xiapu:'霞浦',Fuzhou:'福州',Shanghai:'上海',Kyoto:'京都',Tokyo:'東京'};
+export const localNames={China:'中国',Japan:'日本',...cityLocalNames};
 
 // City -> airports a traveller might use. Xiapu has no airport: Fuzhou Changle is the nearest (~2h by road).
 export const airports={Brisbane:['BNE'],Singapore:['SIN'],Chengdu:['TFU','CTU'],'Xi’an':['XIY'],Guangzhou:['CAN'],Xiapu:['FOC'],Fuzhou:['FOC'],Shanghai:['PVG','SHA'],Kyoto:['KIX','ITM'],Tokyo:['HND','NRT']};
