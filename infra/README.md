@@ -216,3 +216,9 @@ Keep plan files private as they can contain infrastructure secrets.
 After applying, use a private browser window to visit `https://lounge.feifan.dev`
 and verify login, signup and password-reset screens at desktop and mobile sizes.
 No custom domain or custom HTML login page is needed for this native theme.
+
+## MVR research workspace at /mvr
+
+`mvr.tf` and `mvr-worker.js` route `lounge.feifan.dev/mvr/` through the existing tunnel to `http://mvr:8000`. The existing Lounge homepage and Access policy remain unchanged. The Python origin validates the signed Lounge Access JWT; unauthenticated direct-origin requests are rejected.
+
+The MVR repository owns the image, tests, GitHub Actions workflow, and NixOS module. See `../mvr/DEPLOY.md` relative to the projects directory for bootstrap and rollback instructions. Apply this infrastructure only after the first MVR image and home-server service are ready. Preserve existing live inputs and Auth0 credentials as described above; no new Terraform state or separate tunnel is needed.

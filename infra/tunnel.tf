@@ -75,6 +75,11 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "homeserver" {
       service  = "http://powerpoint:8000"
     }
 
+    ingress_rule {
+      hostname = "mvr-origin.feifan.dev"
+      service  = "http://mvr:8000"
+    }
+
     # Required catch-all: hostnames not matched above return 404 at the edge.
     ingress_rule {
       service = "http_status:404"

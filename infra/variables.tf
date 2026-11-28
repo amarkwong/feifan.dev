@@ -165,6 +165,13 @@ variable "lounge_allowed_emails" {
   sensitive   = true
 }
 
+variable "trip_editors" {
+  type        = list(string)
+  description = "Exact emails allowed to read and edit the shared trip plan (you and your travel partner); every other Lounge friend is denied"
+  default     = []
+  sensitive   = true
+}
+
 variable "lounge_friend_hostnames" {
   type        = set(string)
   description = "Browser-based applications protected by the Lounge email allowlist; Jellyfin is deliberately excluded for native-client compatibility"

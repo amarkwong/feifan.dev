@@ -82,3 +82,10 @@ resend_sending_domains = {
 # cloudflare_access_team_name = "your-team-name"
 # owner_email                 = "you@example.com"
 # lounge_allowed_emails       = ["you@example.com", "friend@example.com"]
+
+# --- Shared trip plan (Lounge itinerary studio) ---
+# Only these emails can read or edit the shared plan; other invited friends cannot.
+# trip_editors = ["you@example.com", "partner@example.com"]
+#
+# Flight-number lookup (later): keep API keys out of this file's comments and out of
+# git. Put them in your local, gitignored terraform.tfvars as sensitive variables.
