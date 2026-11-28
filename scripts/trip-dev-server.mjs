@@ -5,6 +5,12 @@
 //   node scripts/trip-dev-server.mjs            # http://127.0.0.1:8787/trip/
 //   TRIP_DB=.trip-dev.sqlite node scripts/...   # keep the plan between runs
 //
+// Flight lookup and hotel-photo search use offline fakes (scripts/fake-upstreams.mjs) so
+// nothing spends real API quota. To try the real services deliberately:
+//   TRIP_LIVE_UPSTREAMS=1 FLIGHT_API_KEY=... [FLIGHT_API_GATEWAY=rapidapi] node scripts/trip-dev-server.mjs
+//
+// TRIP_NOW=2026-11-28T03:00:00Z pins the clock the Worker uses (tests do this).
+//
 // Identity: Cloudflare Access is replaced by the `x-dev-user` request header (default
 // owner@local.test). That bypass lives only in this script; the Worker itself is unchanged.
 import http from 'node:http';
@@ -13,12 +19,20 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {handle} from '../infra/trip-worker.js';
 import {sqliteD1} from './d1-sqlite.mjs';
+import {fakeFetcher} from './fake-upstreams.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../lounge');
 const port = Number(process.env.PORT || 8787);
 const editors = process.env.TRIP_EDITORS || 'owner@local.test,partner@local.test';
 const db = sqliteD1(process.env.TRIP_DB || ':memory:');
-const env = {DB: db, TRIP_EDITORS: editors};
+const live = process.env.TRIP_LIVE_UPSTREAMS === '1';
+const env = {
+  DB: db, TRIP_EDITORS: editors,
+  FLIGHT_API_KEY: live ? process.env.FLIGHT_API_KEY : 'dev-fake-key',
+  FLIGHT_API_GATEWAY: process.env.FLIGHT_API_GATEWAY,
+  FLIGHT_DAILY_CAP: live ? process.env.FLIGHT_DAILY_CAP : '1000', FLIGHT_MONTHLY_CAP: live ? process.env.FLIGHT_MONTHLY_CAP : '1000',
+};
+const fetcher = live ? fetch : fakeFetcher;
 const verify = async request => (request.headers.get('x-dev-user') || 'owner@local.test').toLowerCase();
 
 // Apply the first block of lounge/_headers (the `/*` rules) to every response.
@@ -47,7 +61,7 @@ const server = http.createServer(async (req, res) => {
       const chunks = [];
       for await (const c of req) chunks.push(c);
       const body = ['GET', 'HEAD'].includes(req.method) ? undefined : Buffer.concat(chunks);
-      const response = await handle(new Request(url, {method: req.method, headers: req.headers, body}), env, {verify});
+      const response = await handle(new Request(url, {method: req.method, headers: req.headers, body}), env, {verify, fetcher, now: process.env.TRIP_NOW ? Date.parse(process.env.TRIP_NOW) : Date.now()});
       res.writeHead(response.status, {...globalHeaders, ...Object.fromEntries(response.headers)});
       res.end(Buffer.from(await response.arrayBuffer()));
       return;
@@ -63,4 +77,4 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(500).end('Server error');
   }
 });
-server.listen(port, '127.0.0.1', () => console.log(`Lounge dev server: http://127.0.0.1:${port}/trip/  (editors: ${editors})`));
+server.listen(port, '127.0.0.1', () => console.log(`Lounge dev server: http://127.0.0.1:${port}/trip/  (editors: ${editors}; upstreams: ${live ? 'LIVE' : 'offline fakes'})`));

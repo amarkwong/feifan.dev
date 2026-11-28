@@ -87,5 +87,9 @@ resend_sending_domains = {
 # Only these emails can read or edit the shared plan; other invited friends cannot.
 # trip_editors = ["you@example.com", "partner@example.com"]
 #
-# Flight-number lookup (later): keep API keys out of this file's comments and out of
-# git. Put them in your local, gitignored terraform.tfvars as sensitive variables.
+# Flight-number lookup: an AeroDataBox key (not AviationStack). Leave unset to keep it off.
+# Put the real key only in your local, gitignored terraform.tfvars, never in this example.
+# flight_api_key     = "..."
+# flight_api_gateway = "apimarket"   # or "rapidapi", depending on where the key was issued
+# flight_daily_cap   = 5
+# flight_monthly_cap = 150

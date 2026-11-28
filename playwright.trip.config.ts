@@ -20,7 +20,8 @@ export default defineConfig({
   webServer: {
     command: 'node scripts/trip-dev-server.mjs',
     url: `http://127.0.0.1:${port}/trip/`,
-    env: { PORT: String(port) },
+    // A fixed clock keeps the flight lookup's date-range check independent of when the tests run.
+    env: { PORT: String(port), TRIP_NOW: '2026-11-28T03:00:00Z' },
     reuseExistingServer: !process.env.CI,
   },
   projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],

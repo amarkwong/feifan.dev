@@ -26,6 +26,6 @@ export function sqliteD1(file = ':memory:') {
       }
     },
     // Dev helper, not part of D1.
-    reset: () => { for (const table of ['trip_plan', 'trip_history']) { try { db.exec(`DELETE FROM ${table}`); } catch { /* not created yet */ } } },
+    reset: () => { for (const table of ['trip_plan', 'trip_history', 'flight_cache', 'flight_usage']) { try { db.exec(`DELETE FROM ${table}`); } catch { /* not created yet */ } } },
   };
 }

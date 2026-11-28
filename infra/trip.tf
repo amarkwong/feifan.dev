@@ -35,6 +35,31 @@ resource "cloudflare_worker_script" "trip" {
     text = join(",", var.trip_editors)
   }
 
+  # Flight-number lookup. The key exists only as a Worker secret; leave flight_api_key empty
+  # to keep the lookup switched off (the card then works as a manual form).
+  dynamic "secret_text_binding" {
+    for_each = nonsensitive(var.flight_api_key != "") ? [1] : []
+    content {
+      name = "FLIGHT_API_KEY"
+      text = var.flight_api_key
+    }
+  }
+
+  plain_text_binding {
+    name = "FLIGHT_API_GATEWAY"
+    text = var.flight_api_gateway
+  }
+
+  plain_text_binding {
+    name = "FLIGHT_DAILY_CAP"
+    text = tostring(var.flight_daily_cap)
+  }
+
+  plain_text_binding {
+    name = "FLIGHT_MONTHLY_CAP"
+    text = tostring(var.flight_monthly_cap)
+  }
+
   lifecycle {
     precondition {
       condition     = length(var.trip_editors) > 0

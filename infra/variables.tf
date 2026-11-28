@@ -172,6 +172,36 @@ variable "trip_editors" {
   sensitive   = true
 }
 
+variable "flight_api_key" {
+  type        = string
+  description = "AeroDataBox API key for the trip planner's flight-number lookup. Empty keeps the lookup off. Set it only in the gitignored terraform.tfvars (or TF_VAR_flight_api_key)"
+  default     = ""
+  sensitive   = true
+}
+
+variable "flight_api_gateway" {
+  type        = string
+  description = "Where the AeroDataBox key was issued: apimarket (prod.api.market) or rapidapi"
+  default     = "apimarket"
+
+  validation {
+    condition     = contains(["apimarket", "rapidapi"], var.flight_api_gateway)
+    error_message = "flight_api_gateway must be apimarket or rapidapi."
+  }
+}
+
+variable "flight_daily_cap" {
+  type        = number
+  description = "Most live flight lookups per day across all editors (cached repeats are free)"
+  default     = 5
+}
+
+variable "flight_monthly_cap" {
+  type        = number
+  description = "Most live flight lookups per month; keep below the plan's monthly quota"
+  default     = 150
+}
+
 variable "lounge_friend_hostnames" {
   type        = set(string)
   description = "Browser-based applications protected by the Lounge email allowlist; Jellyfin is deliberately excluded for native-client compatibility"

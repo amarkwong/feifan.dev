@@ -1,4 +1,8 @@
 export const DAY=86400000;
+// Photos are either a small resized upload (data URL) or a Wikimedia Commons thumbnail. Nothing else is
+// allowed, which also keeps the page's CSP (img-src) and any rendering of saved plans safe.
+export const safeImageSrc=s=>typeof s==='string'&&s.length<=120000&&(/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(s)||/^https:\/\/upload\.wikimedia\.org\/wikipedia\/commons\/[\w%./()'-]+$/.test(s));
+export const safeLink=s=>typeof s==='string'&&s.length<=500&&/^https:\/\/[^\s"'<>]+$/.test(s);
 export const STEP=1/48;
 export const snap=n=>Math.round(n*48)/48;
 export const slots=n=>Math.round(n*48);
@@ -17,6 +21,16 @@ export function validate(s){
  if(!Array.isArray(s.items)||s.items.length>180)throw Error('This prototype supports up to 180 cards.');
  const ids=new Set();
  for(const x of s.items){if(typeof x.id!=='string'||ids.has(x.id))throw Error('Invalid or duplicate card ID.');ids.add(x.id);if(!['country','city','activity','logistics'].includes(x.type)||typeof x.title!=='string'||x.title.length>120||!onGrid(x.start)||!onGrid(x.days)||x.start<0||x.days<STEP||slots(x.start)+slots(x.days)>count(s)*48||!Number.isFinite(x.width)||x.width<110||x.width>320)throw Error('Cards must fit the trip, with a minimum of 30 minutes.');}
+ for(const x of s.items){
+  if(x.image!==undefined&&(!x.image||typeof x.image!=='object'||!safeImageSrc(x.image.src)||(x.image.link!==undefined&&!safeLink(x.image.link))||(x.image.credit!==undefined&&(typeof x.image.credit!=='string'||x.image.credit.length>200))))throw Error('This photo is not allowed. Upload one or choose a suggested photo.');
+  if(x.bookingUrl!==undefined&&!safeLink(x.bookingUrl))throw Error('Booking links must start with https://');
+  if(x.price!==undefined&&(!Number.isFinite(x.price)||x.price<0||x.price>1e7))throw Error('Price must be a positive number.');
+  if(x.guests!==undefined&&(!Number.isInteger(x.guests)||x.guests<1||x.guests>12))throw Error('Guests must be between 1 and 12.');
+  for(const k of ['brand','roomType','confirmation','airlineName','flightNo','address','currency','depAirport','arrAirport'])if(x[k]!==undefined&&(typeof x[k]!=='string'||x[k].length>300))throw Error('A card detail is too long.');
+  if(x.flightNo!==undefined&&!/^(?=[A-Z0-9]?[A-Z])[A-Z0-9]{2}\d{1,4}[A-Z]?$/.test(x.flightNo))throw Error('Flight numbers look like SQ246.');
+  for(const k of ['depAirport','arrAirport'])if(x[k]!==undefined&&!/^[A-Z]{3}$/.test(x[k]))throw Error('Airport codes have three letters, like BNE.');
+  for(const k of ['depLocal','arrLocal'])if(x[k]!==undefined&&!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(x[k]))throw Error('Flight times must be dates with a time.');
+ }
  for(const x of s.items){const p=s.items.find(y=>y.id===x.parent);if(x.type==='country'&&x.parent)throw Error('Countries attach to the timeline.');if(x.type==='city'&&(!p||p.type!=='country'||x.country!==p.title))throw Error('Attach this city to its country first.');if(x.type==='activity'&&(!p||p.type!=='city'||(x.city&&x.city!==p.title)))throw Error('Attach this activity to its city first.');if(x.type==='logistics'&&p&&!['country','city'].includes(p.type))throw Error('Transport and stays attach to the timeline, a country or a city.');if(x.parent&&!p)throw Error('Parent card is missing.');if(p&&(slots(x.start)<slots(p.start)||slots(x.start)+slots(x.days)>slots(p.start)+slots(p.days)))throw Error('Keep attached cards inside their parent dates.');if(['country','city'].includes(x.type)&&s.items.some(y=>y.id!==x.id&&y.type===x.type&&y.parent===x.parent&&overlap(x,y)))throw Error('Country and city stays cannot overlap. Choose a free day.');}
  return s;
 }

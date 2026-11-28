@@ -20,3 +20,7 @@ export const activities=[
 export const landmarks={"Chengdu": {"file": "chengdu.svg", "name": "Anshun Bridge"}, "Xi’an": {"file": "xian.svg", "name": "Giant Wild Goose Pagoda"}, "Guangzhou": {"file": "guangzhou.svg", "name": "Canton Tower"}, "Xiapu": {"file": "xiapu.svg", "name": "Dongbi coast"}, "Fuzhou": {"file": "fuzhou.svg", "name": "Three Lanes and Seven Alleys"}, "Shanghai": {"file": "shanghai.svg", "name": "Oriental Pearl Tower"}, "Kyoto": {"file": "kyoto.svg", "name": "Yasaka Pagoda"}, "Tokyo": {"file": "tokyo.svg", "name": "Tokyo Tower"}};
 
 export const localNames={China:'中国',Japan:'日本',Chengdu:'成都','Xi’an':'西安',Guangzhou:'广州',Xiapu:'霞浦',Fuzhou:'福州',Shanghai:'上海',Kyoto:'京都',Tokyo:'東京'};
+
+// City -> airports a traveller might use. Xiapu has no airport: Fuzhou Changle is the nearest (~2h by road).
+export const airports={Brisbane:['BNE'],Singapore:['SIN'],Chengdu:['TFU','CTU'],'Xi’an':['XIY'],Guangzhou:['CAN'],Xiapu:['FOC'],Fuzhou:['FOC'],Shanghai:['PVG','SHA'],Kyoto:['KIX','ITM'],Tokyo:['HND','NRT']};
+export const airportNames={BNE:'Brisbane',SIN:'Singapore Changi',TFU:'Chengdu Tianfu',CTU:'Chengdu Shuangliu',XIY:'Xi’an Xianyang',CAN:'Guangzhou Baiyun',FOC:'Fuzhou Changle',PVG:'Shanghai Pudong',SHA:'Shanghai Hongqiao',KIX:'Osaka Kansai',ITM:'Osaka Itami',HND:'Tokyo Haneda',NRT:'Tokyo Narita'};

@@ -54,3 +54,40 @@ npm run test:trip    # Playwright against the dev server: sync, conflicts, offli
 The dev server replaces Cloudflare Access with an `x-dev-user` request header
 (default `owner@local.test`; editors default to `owner@local.test,partner@local.test`).
 That bypass exists only in the dev script, never in the deployed Worker.
+
+## Flight cards
+
+Type a flight number on a Flight card and press **Look up**: airline, airports, local times and
+duration are filled in for the card's date (you still press *Apply changes*). Everything can also be
+typed by hand. The card spans the half-hours the flight covers; the exact local times and an airline
+badge (text, not a logo) show on the card.
+
+- The key never reaches the browser: the page calls `GET /api/trip/flight?no=SQ246&date=…` and the
+  Worker calls AeroDataBox (`infra/trip-worker.js`). Editors only.
+- Quota protection: results are cached 24 h in D1 (repeats are free), at most `flight_daily_cap`
+  (default 5) and `flight_monthly_cap` (default 150) live lookups, and a failed cap never calls the provider.
+- **Needs an AeroDataBox key.** An AviationStack key will not work (different API). Set
+  `flight_api_key` (and `flight_api_gateway` = `apimarket` or `rapidapi`) in the gitignored
+  `infra/terraform.tfvars`, then `terraform apply`. Without a key the Look up button explains that
+  it is not set up and the card is a plain form.
+- The response parser follows AeroDataBox's documented schema but has not been checked against a
+  recorded live response. After the first real lookup, compare the card with the airline's site and
+  save the raw JSON as a test fixture (see `scripts/fake-upstreams.mjs`).
+
+## Stay cards
+
+Hotel cards now carry brand, room type, guests, price per night and currency, confirmation number,
+booking link (https only) and a booked tick; the card shows brand, nights and price.
+
+Photos: **Find a photo** searches Wikipedia lead images by brand/name through the Worker and lists
+only files that are on Wikimedia Commons under a free licence, with author and licence credit.
+**Upload photo** shrinks your own image to ≤480 px (≈60 KB) and stores it in the plan. Pasting an
+arbitrary image URL is deliberately not offered: the CSP allows only uploads and Wikimedia thumbnails.
+Chain logos are mostly non-free, so brand-only searches often find nothing; upload one instead.
+
+## Testing without spending API quota
+
+`npm run test:unit` and `npm run test:trip` use offline fakes (`scripts/fake-upstreams.mjs`) for the
+flight API and Wikipedia; nothing in either suite makes a network call to a provider. The dev server
+does the same unless you opt in with `TRIP_LIVE_UPSTREAMS=1 FLIGHT_API_KEY=… npm run dev:trip`.
+Wikimedia thumbnails are stubbed in the browser tests.
